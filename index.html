@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DDP · Sistema Operativo</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#F4F5F7;color:#1a1a2e}
+.app{min-height:100vh;background:#F4F5F7;display:flex;flex-direction:column}
+.hdr{background:#fff;border-bottom:1px solid #E2E4EA;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(49,50,128,.07);flex-shrink:0}
+.hdr-l{display:flex;align-items:center;gap:14px}
+.hdr-div{width:1px;height:28px;background:#E2E4EA}
+.hdr-t{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8a8aaa}
+.hdr-s{font-size:9px;color:rgba(138,138,170,.6);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.hdr-r{display:flex;align-items:center;gap:10px}
+.ubadge{display:flex;align-items:center;gap:8px;background:#F4F5F7;border:1px solid #E2E4EA;border-radius:10px;padding:6px 12px}
+.odot{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 2px #f0fdf4;flex-shrink:0}
+.uname{font-size:13px;font-weight:600;color:#1a1a2e}
+.rpill{padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.rp-g{background:#eef0ff;color:#313280;border:1px solid #c7c9f0}
+.rp-c{background:#fff0f0;color:#A11C27;border:1px solid #f5c6c8}
+.rp-o{background:#e0f2fe;color:#0369a1;border:1px solid #bae0fd}
+.rp-j{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe}
+.body{display:flex;flex:1;overflow:hidden}
+.sb{width:230px;background:#313280;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sg{padding:14px 18px 4px;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;font-weight:500;color:rgba(255,255,255,.72);border-left:3px solid transparent;cursor:pointer;transition:all .12s}
+.ni.act{background:#A11C27;color:#fff;font-weight:700;border-left-color:rgba(255,255,255,.35)}
+.ni.lk{color:rgba(255,255,255,.2);cursor:default}
+.ni-ic{width:18px;text-align:center;font-size:13px;flex-shrink:0}
+.ni-lk{margin-left:auto;font-size:10px;color:rgba(255,255,255,.18)}
+.sf{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,.1)}
+.sf-n{font-size:12px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:2px}
+.sf-s{font-size:10px;color:rgba(255,255,255,.4)}
+.sf-v{font-size:9px;color:rgba(255,255,255,.2);margin-top:6px;letter-spacing:1px}
+.main{flex:1;padding:22px 26px;overflow-y:auto;background:#F4F5F7}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.ra{width:4px;height:26px;background:#A11C27;border-radius:2px;flex-shrink:0}
+.pt{font-size:24px;font-weight:800;color:#1a1a2e;letter-spacing:-.5px}
+.ps{font-size:12px;color:#8a8aaa;font-weight:500;margin-bottom:18px;padding-left:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:13px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
+.g21{display:grid;grid-template-columns:1.4fr 1fr;gap:13px;margin-bottom:13px}
+.card{background:#fff;border:1px solid #E2E4EA;border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(49,50,128,.07)}
+.ct{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8a8aaa;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.cta{width:3px;height:12px;background:#A11C27;border-radius:2px;flex-shrink:0}
+.kpi{background:#fff;border:1px solid #E2E4EA;border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(49,50,128,.07)}
+.kl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8a8aaa;margin-bottom:7px}
+.kv{font-size:26px;font-weight:800;color:#1a1a2e;letter-spacing:-1px;line-height:1;margin-bottom:4px}
+.ku{font-size:11px;color:#8a8aaa;font-weight:500;margin-left:3px}
+.kok{font-size:11px;font-weight:600;color:#16a34a}
+.knok{font-size:11px;font-weight:600;color:#A11C27}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 11px;color:#8a8aaa;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;border-bottom:1px solid #E2E4EA}
+td{padding:9px 11px;border-bottom:1px solid rgba(226,228,234,.4);color:#1a1a2e;vertical-align:middle}
+td.m{color:#8a8aaa;font-size:12px}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.badge-n{background:rgba(49,50,128,.1);color:#313280;border:1px solid rgba(49,50,128,.2)}
+.badge-r{background:rgba(161,28,39,.1);color:#A11C27;border:1px solid rgba(161,28,39,.2)}
+.badge-g{background:rgba(22,163,74,.1);color:#16a34a;border:1px solid rgba(22,163,74,.2)}
+.badge-a{background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.2)}
+.badge-m{background:rgba(138,138,170,.1);color:#8a8aaa;border:1px solid rgba(138,138,170,.2)}
+.alert{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:7px;cursor:pointer}
+.alert-a{background:#fef2f2;border:1px solid #fca5a5}
+.alert-m{background:#fffbeb;border:1px solid #fcd34d}
+.alert-b{background:#f0fdf4;border:1px solid #86efac}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.adot-a{background:#dc2626}.adot-m{background:#d97706}.adot-b{background:#16a34a}
+.form{display:flex;flex-direction:column;gap:13px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.r4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px}
+label.lbl{font-size:10px;color:#8a8aaa;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;display:block;font-weight:700}
+input,select,textarea{width:100%;background:#F4F5F7;border:1.5px solid #E2E4EA;border-radius:9px;padding:10px 12px;color:#1a1a2e;font-size:13px;font-family:'Segoe UI',sans-serif;box-sizing:border-box;outline:none}
+textarea{resize:vertical;min-height:75px}
+.btn{padding:10px 18px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Segoe UI',sans-serif}
+.btn-p{background:#313280;color:#fff}
+.btn-p:disabled{background:#94a3b8;cursor:not-allowed}
+.btn-s{background:#fff;color:#4a4a6a;border:1px solid #E2E4EA}
+.btn-pdf{padding:7px 13px;border-radius:8px;border:none;background:#A11C27;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:'Segoe UI',sans-serif}
+.btn-xls{padding:7px 13px;border-radius:8px;border:1px solid #16a34a;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:'Segoe UI',sans-serif}
+.btn-out{padding:6px 12px;border-radius:7px;border:1px solid #E2E4EA;background:transparent;color:#8a8aaa;font-size:12px;font-weight:600;cursor:pointer;font-family:'Segoe UI',sans-serif}
+.ok-b{background:#f0fdf4;border:1px solid #86efac;border-radius:9px;padding:11px 15px;color:#16a34a;font-size:13px;font-weight:600;margin-bottom:13px}
+.warn-b{background:#fffbeb;border:1px solid #fcd34d;border-radius:9px;padding:11px 15px;color:#d97706;font-size:13px;font-weight:600;margin-bottom:13px}
+.err-b{background:#fef2f2;border:1px solid #fca5a5;border-radius:9px;padding:11px 15px;color:#dc2626;font-size:13px;font-weight:600;margin-bottom:13px}
+.divider{height:1px;background:#E2E4EA;margin:14px 0}
+.ptrack{height:5px;border-radius:3px;background:#F4F5F7;overflow:hidden}
+.pfill{height:100%;border-radius:3px;transition:width .6s ease}
+.ovfl{overflow-x:auto}
+/* Loading */
+.loading-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F4F5F7;gap:16px}
+.loading-logo{font-size:36px;font-weight:800;color:#313280;letter-spacing:-1px}
+.loading-sub{font-size:11px;color:#8a8aaa;letter-spacing:3px;text-transform:uppercase}
+.spinner{width:36px;height:36px;border:3px solid #E2E4EA;border-top-color:#313280;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:13px;color:#8a8aaa}
+/* Login */
+.lw{min-height:100vh;background:#F4F5F7;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:20px}
+.lc{position:relative;z-index:2;background:#fff;border:1px solid #E2E4EA;border-radius:18px;padding:44px 40px;width:100%;max-width:400px;box-shadow:0 4px 32px rgba(49,50,128,.10)}
+@media(max-width:600px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr}.g21{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.r4{grid-template-columns:1fr 1fr}.sb{width:200px}.main{padding:16px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const{useState,useEffect,useRef,useCallback}=React;
+
+// ── Airtable config ────────────────────────────────────────────────────────────
+const AT_BASE="appVuSykRABkM3XXI";
+const AT_TOKEN="patfL6uHOOBq1kzwe.fc0add0f55e8bc5d9ad05d051e186000bfc6e4678d3b467883f56e8f1491b35b";
+const AT_URL=`https://api.airtable.com/v0/${AT_BASE}`;
+const AT_HDR={"Authorization":`Bearer ${AT_TOKEN}`,"Content-Type":"application/json"};
+
+async function atList(table){
+  const recs=[];let offset=null;
+  do{
+    const u=`${AT_URL}/${encodeURIComponent(table)}?pageSize=100${offset?`&offset=${offset}`:""}`;
+    const r=await fetch(u,{headers:AT_HDR});
+    if(!r.ok)throw new Error(`Error cargando ${table}`);
+    const d=await r.json();
+    recs.push(...d.records);offset=d.offset;
+  }while(offset);
+  return recs;
+}
+async function atCreate(table,fields){
+  const r=await fetch(`${AT_URL}/${encodeURIComponent(table)}`,{method:"POST",headers:AT_HDR,body:JSON.stringify({records:[{fields}]})});
+  if(!r.ok)throw new Error(`Error guardando en ${table}`);
+  const d=await r.json();return d.records[0];
+}
+async function atDelete(table,id){
+  const r=await fetch(`${AT_URL}/${encodeURIComponent(table)}/${id}`,{method:"DELETE",headers:AT_HDR});
+  if(!r.ok)throw new Error(`Error al borrar en ${table}`);
+  return r.json();
+}
+async function atUpdate(table,id,fields){
+  const r=await fetch(`${AT_URL}/${encodeURIComponent(table)}/${id}`,{method:"PATCH",headers:AT_HDR,body:JSON.stringify({fields})});
+  if(!r.ok)throw new Error(`Error actualizando ${table}`);
+  return r.json();
+}
+
+// ── Data mappers ───────────────────────────────────────────────────────────────
+const mappers={
+  Eventos:{
+    from:r=>({_id:r.id,id:r.id,ts:r.fields.Timestamp||"",tipo:r.fields.Tipo||"",turno:r.fields.Turno||"",ton:r.fields.Toneladas||null,m3:r.fields.M3||null,kd:r.fields.KmDesde||null,kh:r.fields.KmHasta||null,det:r.fields.Detalle||"",auto:r.fields.Auto||false}),
+    to:e=>({Timestamp:e.ts,Tipo:e.tipo,Turno:e.turno,Toneladas:e.ton||null,M3:e.m3||null,KmDesde:e.kd||null,KmHasta:e.kh||null,Detalle:e.det||"",Auto:e.auto||false}),
+  },
+  Trafico:{
+    from:r=>({_id:r.id,id:r.id,ts:r.fields.Timestamp||"",nombre:r.fields.Nombre||"",tipo:r.fields.Tipo||"",barcazas:r.fields.Barcazas||0,calado:r.fields.Calado||0,sentido:r.fields.Sentido||"bajada",obs:r.fields.Obs||""}),
+    to:t=>({Timestamp:t.ts,Nombre:t.nombre,Tipo:t.tipo,Barcazas:t.barcazas||0,Calado:t.calado||0,Sentido:t.sentido,Obs:t.obs||""}),
+  },
+  Mantenimiento:{
+    from:r=>({_id:r.id,id:r.id,barco:r.fields.Barco||"",eq:r.fields.Equipo||"",tarea:r.fields.Tarea||"",frec:r.fields.Frecuencia||null,u:r.fields.Unidad||"hs",uHs:r.fields.UltimaHs||null,uF:r.fields.UltimaFecha||"",pHs:r.fields.ProxHs||null,est:r.fields.Estado||"ok"}),
+    to:m=>({Barco:m.barco,Equipo:m.eq,Tarea:m.tarea,Frecuencia:m.frec||null,Unidad:m.u,UltimaHs:m.uHs||null,UltimaFecha:m.uF||"",ProxHs:m.pHs||null,Estado:m.est}),
+  },
+  Incidentes:{
+    from:r=>({_id:r.id,id:r.id,nro:r.fields.Nro||"",fRep:r.fields.FechaReporte||"",por:r.fields.ReportadoPor||"",a:r.fields.ReportadoA||"",fInc:r.fields.FechaInc||"",hora:r.fields.Hora||"",ub:r.fields.Ubicacion||"",op:r.fields.Operacion||"",parte:r.fields.Parte||"",clas:r.fields.Clasificacion||"Operacional",cond:r.fields.CondOperativa||"Operativo",hPar:r.fields.HorasParada||0,derrame:r.fields.Derrame||false,les:r.fields.Lesionados||false,desc:r.fields.Descripcion||"",causa:r.fields.CausaRaiz||"",accion:r.fields.AccionCorrectiva||"",test:r.fields.Testigos||"",est:r.fields.Estado||"Abierto"}),
+    to:i=>({Nro:i.nro,FechaReporte:i.fRep,ReportadoPor:i.por,ReportadoA:i.a,FechaInc:i.fInc,Hora:i.hora,Ubicacion:i.ub,Operacion:i.op,Parte:i.parte,Clasificacion:i.clas,CondOperativa:i.cond,HorasParada:i.hPar||0,Derrame:i.derrame||false,Lesionados:i.les||false,Descripcion:i.desc,CausaRaiz:i.causa,AccionCorrectiva:i.accion,Testigos:i.test,Estado:i.est}),
+  },
+  Combustible:{
+    from:r=>({_id:r.id,id:r.id,fecha:r.fields.Fecha||"",tipo:r.fields.Tipo||"Consumo",c24h:r.fields.Consumo24h||0,total:r.fields.Total||0,obs:r.fields.Obs||""}),
+    to:c=>({Fecha:c.fecha,Tipo:c.tipo,Consumo24h:c.c24h||0,Total:c.total||0,Obs:c.obs||""}),
+  },
+  Logbook:{
+    from:r=>({_id:r.id,id:r.id,fecha:r.fields.Fecha||"",rpm:r.fields.RPM||0,c1:r.fields.C1||0,c2:r.fields.C2||0,c3:r.fields.C3||0,c4:r.fields.C4||0,c5:r.fields.C5||0,c6:r.fields.C6||0,tc:r.fields.PostTC||0,htI:r.fields.HTIn||0,htO:r.fields.HTOut||0,lub:r.fields.Lub||0,obs:r.fields.Obs||""}),
+    to:l=>({Fecha:l.fecha,RPM:l.rpm||0,C1:l.c1||0,C2:l.c2||0,C3:l.c3||0,C4:l.c4||0,C5:l.c5||0,C6:l.c6||0,PostTC:l.tc||0,HTIn:l.htI||0,HTOut:l.htO||0,Lub:l.lub||0,Obs:l.obs||""}),
+  },
+  Inventario:{
+    from:r=>({_id:r.id,id:r.id,sala:r.fields.Sala||"",sec:r.fields.Sector||"",desc:r.fields.Desc||"",cant:r.fields.Cant||0,min:r.fields.Min||0}),
+    to:i=>({Sala:i.sala,Sector:i.sec,Desc:i.desc,Cant:i.cant||0,Min:i.min||0}),
+  },
+  Alarmas:{
+    from:r=>({_id:r.id,id:r.id,nro:r.fields.Nro||"",fecha:r.fields.Fecha||"",hI:r.fields.HoraInicio||"",hF:r.fields.HoraFin||"",inspector:r.fields.Inspector||"",cargo:r.fields.Cargo||"",prox:r.fields.ProxFecha||"",fallas:JSON.parse(r.fields.Fallas||"[]"),rows:JSON.parse(r.fields.Rows||"[]")}),
+    to:a=>({Nro:a.nro,Fecha:a.fecha,HoraInicio:a.hI,HoraFin:a.hF,Inspector:a.inspector,Cargo:a.cargo,ProxFecha:a.prox,Fallas:JSON.stringify(a.fallas||[]),Rows:JSON.stringify(a.rows||[])}),
+  },
+  Reuniones:{
+    from:r=>({_id:r.id,id:r.id,fecha:r.fields.Fecha||"",asist:r.fields.Asistentes||"",temas:r.fields.Temas||"",acuerdos:r.fields.Acuerdos||"",resp:r.fields.Resp||""}),
+    to:r=>({Fecha:r.fecha,Asistentes:r.asist,Temas:r.temas,Acuerdos:r.acuerdos,Resp:r.resp}),
+  },
+  ActasMando:{
+    from:r=>({_id:r.id,id:r.id,tipo:r.fields.Tipo||"capitan",fecha:r.fields.Fecha||"",zona:r.fields.Zona||"",sal:r.fields.Saliente||"",ent:r.fields.Entrante||"",sistemas:JSON.parse(r.fields.Sistemas||"[]"),checklist:JSON.parse(r.fields.Checklist||"[]"),obs:r.fields.Obs||""}),
+    to:a=>({Tipo:a.tipo,Fecha:a.fecha,Zona:a.zona,Saliente:a.sal,Entrante:a.ent,Sistemas:JSON.stringify(a.sistemas||[]),Checklist:JSON.stringify(a.checklist||[]),Obs:a.obs||""}),
+  },
+};
+
+// ── Tripulacion mappers ───────────────────────────────────────────────────────────
+const mapTrip={
+  from:r=>({_id:r.id,id:r.id,idNum:r.fields.IDTripulante||0,nombre:r.fields.Nombre||"",cargo:r.fields.Cargo||"",libreta:r.fields.NroLibreta||0,ingreso:r.fields.FechaIngreso||"",embarcado:r.fields.Embarcado||false}),
+  to:t=>({IDTripulante:t.idNum,Nombre:t.nombre,Cargo:t.cargo,NroLibreta:t.libreta||0,FechaIngreso:t.ingreso||"",Embarcado:t.embarcado||false}),
+};
+const mapEmb={
+  from:r=>({_id:r.id,id:r.id,idTrip:r.fields.IDTripulante||0,nombre:r.fields.Nombre||"",fEmb:r.fields.FechaEmbarque||"",fDes:r.fields.FechaDesembarque||"",dias:r.fields.DiasTrabajos||0,francos:r.fields.FrancosGenerados||0}),
+  to:e=>({IDTripulante:e.idTrip,Nombre:e.nombre,FechaEmbarque:e.fEmb,FechaDesembarque:e.fDes||"",DiasTrabajos:e.dias||0,FrancosGenerados:e.francos||0}),
+};
+const mapFrancos={
+  from:r=>({_id:r.id,id:r.id,idTrip:r.fields.IDTripulante||0,nombre:r.fields.Nombre||"",fecha:r.fields.Fecha||"",dias:r.fields.DiasUsados||0,obs:r.fields.Obs||"",tipo:r.fields.Obs&&r.fields.Obs.startsWith("[VAC]")?"vacaciones":"franco"}),
+  to:f=>({IDTripulante:f.idTrip,Nombre:f.nombre,Fecha:f.fecha,DiasUsados:f.dias||0,Obs:(f.tipo==="vacaciones"?"[VAC] ":"")+( f.obs||"")}),
+};
+
+// ── Static config ──────────────────────────────────────────────────────────────
+// Users loaded from localStorage (managed by Gerencia) + master account
+function getCapacidadCombustible(){
+  return parseInt(localStorage.getItem("ddp_cap_combustible")||"75000");
+}
+function setCapacidadCombustible(v){
+  localStorage.setItem("ddp_cap_combustible",String(v));
+}
+const MASTER_USER={"jschebela@ddp.com.py":{password:"admin2026",role:"gerente",name:"Juan Schebela",cargo:"Gerencia — DDP"}};
+function getUsers(){
+  try{
+    const stored=localStorage.getItem("ddp_users");
+    const extra=stored?JSON.parse(stored):{};
+    return {...MASTER_USER,...extra};
+  }catch{return {...MASTER_USER};}
+}
+function saveUsers(users){
+  const noMaster={...users};
+  delete noMaster["jschebela@ddp.com.py"];
+  localStorage.setItem("ddp_users",JSON.stringify(noMaster));
+}
+// Initial users if none stored yet
+(function(){
+  const stored=localStorage.getItem("ddp_users");
+  if(!stored){
+    saveUsers({
+      "capitan@ddp.com.py":{password:"ddp2026",role:"capitan",name:"Capitán",cargo:"Capitán Taruma"},
+      "jm@ddp.com.py":{password:"maquinas2026",role:"jefemaquina",name:"Jefe de Máquinas",cargo:"Jefe de Máquinas"},
+      "taruma@ddp.com.py":{password:"draga2026",role:"oficial",name:"Oficial de Guardia",cargo:"Oficial de Guardia"},
+    });
+  }
+})();
+const ROLES_LABEL={gerente:"Gerencia",capitan:"Capitán",oficial:"Oficial",jefemaquina:"Jefe Máquinas"};
+const RPILL={gerente:"rp-g",capitan:"rp-c",oficial:"rp-o",jefemaquina:"rp-j"};
+const NAV=[
+  {group:"Operaciones",items:[
+    {id:"dashboard",label:"Dashboard",icon:"◧",roles:["gerente","capitan"]},
+    {id:"reporte_op",label:"Reporte Operativo",icon:"◈",roles:["gerente","capitan","oficial"]},
+    {id:"trafico",label:"Tráfico del Paso",icon:"⇄",roles:["gerente","capitan","oficial"]},
+    {id:"rep_semanal",label:"Reporte Semanal",icon:"◫",roles:["gerente","capitan","oficial"]},
+  ]},
+  {group:"Técnico",items:[
+    {id:"logbook",label:"Logbook M/E",icon:"◎",roles:["gerente","capitan","jefemaquina"]},
+    {id:"combustible",label:"Combustible",icon:"◉",roles:["gerente","capitan","jefemaquina"]},
+    {id:"mantenimiento",label:"Mantenimiento",icon:"⚙",roles:["gerente","capitan","jefemaquina"]},
+    {id:"alarmas",label:"Alarmas Sentina",icon:"●",roles:["gerente","capitan","jefemaquina"]},
+    {id:"inventario",label:"Inventario",icon:"▤",roles:["gerente","capitan","oficial","jefemaquina"]},
+  ]},
+  {group:"Gestión",items:[
+    {id:"incidentes",label:"Incidentes",icon:"⚠",roles:["gerente","capitan","oficial","jefemaquina"]},
+    {id:"actas",label:"Actas de Mando",icon:"✦",roles:["gerente","capitan","jefemaquina"]},
+    {id:"reuniones",label:"Reuniones",icon:"◻",roles:["gerente","capitan","oficial","jefemaquina"]},
+    {id:"tripulacion",label:"Tripulación",icon:"👥",roles:["gerente"]},
+    {id:"procedimientos",label:"Procedimientos",icon:"📖",roles:["gerente","capitan","oficial","jefemaquina"]},
+    {id:"usuarios",label:"Usuarios",icon:"👤",roles:["gerente"]},{id:"config",label:"Configuración",icon:"◌",roles:["gerente"]},
+  ]},
+];
+const TURNOS_I=[{id:"A",nombre:"Turno A",tripulacion:"Vera / López"},{id:"B",nombre:"Turno B",tripulacion:"Gómez / Ruiz"},{id:"C",nombre:"Turno C",tripulacion:"Díaz / Martínez"},{id:"D",nombre:"Turno D",tripulacion:"Torres / Pérez"},{id:"E",nombre:"Turno E",tripulacion:"Soria / Benítez"},{id:"F",nombre:"Turno F",tripulacion:"Ríos / Cabral"}];
+const TIPOS_I=["Inicio de dragado","Inicio de dragado por rainbow a babor","Inicio de dragado por rainbow a estribor","Fin de dragado","Fin de dragado y navegación a zona de descarga","Arrastre con carga en bodega de subida","Arrastre con carga en bodega de bajada","Inicio descarga de bodegas","Finaliza descarga de bodegas","Estacionario con carga en bodega","En espera de tráfico","Parada por mantenimiento","Fin de dragado (liberación de canal)","Bunker / Abastecimiento","Cambio de guardia","Otro"];
+const ALARMAS_C=["Bow Thruster / Generador","Espacio vacío – Proa Babor","Espacio vacío – Popa Babor","Espacio vacío – Proa Estribor","Espacio vacío – Popa Estribor","Sala de Bombas – Medio Babor","Sala de Bombas – Medio Centro","Sala de Bombas – Medio Estribor","Sala de Bombas – Popa Estribor","Sala de Máquinas – Popa Centro"];
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const nowTs=()=>new Date().toISOString().slice(0,16);
+const fmtTs=ts=>{const d=new Date(ts);return d.toLocaleDateString("es-PY")+" "+d.toLocaleTimeString("es-PY",{hour:"2-digit",minute:"2-digit"});};
+const fmtHora=ts=>new Date(ts).toLocaleTimeString("es-PY",{hour:"2-digit",minute:"2-digit"});
+const diasHasta=f=>{if(!f)return null;return Math.round((new Date(f)-new Date())/(1000*60*60*24));};
+function duracion(a,b){if(!a||!b)return null;const m=Math.round((new Date(b)-new Date(a))/60000);if(m<=0)return null;const h=Math.floor(m/60),mm=m%60;return h>0?(mm>0?h+"h "+mm+"m":h+"h"):mm+"m";}
+const esFin=t=>t.includes("Fin de dragado")&&t.includes("navegación");
+const esFinSolo=t=>t==="Fin de dragado";
+const esFinCualquiera=t=>esFin(t)||esFinSolo(t);
+const esRainbow=t=>t.includes("rainbow");
+const esNav=t=>t.includes("navegación")||t.includes("Arrastre");
+const fmtTsCsv=ts=>{if(!ts)return"";try{const d=new Date(ts);const dd=String(d.getDate()).padStart(2,"0");const mm=String(d.getMonth()+1).padStart(2,"0");const yy=d.getFullYear();const hh=String(d.getHours()).padStart(2,"0");const mn=String(d.getMinutes()).padStart(2,"0");return dd+"/"+mm+"/"+yy+" "+hh+":"+mn;}catch{return ts;}};
+
+function exportarPDF(titulo,numero,fecha,secciones,firmante){
+  const secHTML=secciones.map((s,i)=>`<div class="sec"><div class="st">${i+1}. ${s.titulo}</div>${s.tipo==="tabla"?`<table><thead><tr>${s.cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${s.filas.map(f=>`<tr>${f.map(c=>`<td>${c||"—"}</td>`).join("")}</tr>`).join("")}</tbody></table>`:s.tipo==="campos"?`<div class="flds">${s.campos.map(([l,v])=>`<div class="fld"><span class="fl">${l}:</span><span class="fv">${v||"—"}</span></div>`).join("")}</div>`:`<div class="tb">${s.contenido||""}</div>`}</div>`).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;font-size:10pt;color:#1a1a2e;padding:24px}.hdr{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #A11C27;margin-bottom:18px}.logo{font-size:20pt;font-weight:800;color:#313280}.logos{font-size:8pt;color:#8a8aaa;letter-spacing:2px;text-transform:uppercase}.dt{font-size:12pt;font-weight:800;text-align:right}.dm{font-size:8pt;color:#4a4a6a;text-align:right}.sec{margin-bottom:16px}.st{font-size:9pt;font-weight:700;color:#313280;text-transform:uppercase;letter-spacing:1px;background:#eef0ff;padding:5px 10px;border-left:3px solid #313280;margin-bottom:9px}table{width:100%;border-collapse:collapse;font-size:9pt}th{background:#313280;color:#fff;padding:6px 9px;text-align:left;font-size:8pt}td{padding:6px 9px;border-bottom:1px solid #E2E4EA}tr:nth-child(even) td{background:#F4F5F7}.flds{display:grid;grid-template-columns:1fr 1fr;gap:7px}.fld{padding:6px 10px;background:#F4F5F7;border-radius:5px;border:1px solid #E2E4EA}.fl{font-size:8pt;font-weight:700;color:#8a8aaa;text-transform:uppercase;display:block;margin-bottom:2px}.fv{font-size:10pt;font-weight:600}.tb{padding:9px 13px;background:#F4F5F7;border-radius:7px;border:1px solid #E2E4EA;line-height:1.6;min-height:45px}.firma-s{margin-top:28px;padding-top:14px;border-top:2px solid #E2E4EA;display:grid;grid-template-columns:1fr 1fr;gap:28px}.firma-b{border:1px solid #E2E4EA;border-radius:8px;padding:13px}.firma-l{font-size:8pt;font-weight:700;color:#8a8aaa;text-transform:uppercase;margin-bottom:7px}.firma-n{font-size:11pt;font-weight:700;margin-bottom:3px}.firma-c{font-size:9pt;color:#4a4a6a;margin-bottom:13px}.firma-line{border-bottom:1.5px solid #1a1a2e;margin-top:22px}.footer{margin-top:22px;padding-top:9px;border-top:1px solid #E2E4EA;display:flex;justify-content:space-between;font-size:7pt;color:#8a8aaa}.conf{font-weight:700;color:#A11C27}@media print{.sec{page-break-inside:avoid}}</style></head><body><div class="hdr"><div><div class="logo">DDP</div><div class="logos">Dragados del Paraguay</div></div><div><div class="dt">${titulo}</div><div class="dm">N° ${numero||"—"} · ${fecha||new Date().toLocaleDateString("es-PY")}</div></div></div>${secHTML}<div class="firma-s"><div class="firma-b"><div class="firma-l">Elaborado por</div><div class="firma-n">${(firmante&&firmante.nombre)||"__________________________"}</div><div class="firma-c">${(firmante&&firmante.cargo)||""}</div><div class="firma-line"></div><div style="font-size:8pt;color:#8a8aaa;margin-top:4px">Firma</div></div><div class="firma-b"><div class="firma-l">Aprobado por</div><div class="firma-n">__________________________</div><div class="firma-c">&nbsp;</div><div class="firma-line"></div><div style="font-size:8pt;color:#8a8aaa;margin-top:4px">Firma</div></div></div><div class="footer"><span><span class="conf">CONFIDENCIAL</span> · DDP · Sistema Operativo</span><span>Generado: ${new Date().toLocaleString("es-PY")}</span></div><script>window.onload=()=>window.print();<\/script></body></html>`;
+  const b=new Blob([html],{type:"text/html;charset=utf-8"});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement("a");a.href=u;a.download=titulo.replace(/[^a-z0-9]/gi,"_").slice(0,40)+".html";document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),3000);
+}
+function exportarCSV(nombre,cabeceras,filas){
+  const SEP=";";
+  const esc=v=>{
+    const s=String(v===null||v===undefined?"":v);
+    return '"'+s.replace(/"/g,'""')+'"';
+  };
+  const rows=[cabeceras,...filas].map(r=>r.map(esc).join(SEP));
+  const csv="\ufeff"+rows.join("\r\n");
+  const b=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement("a");
+  a.href=u;a.download=nombre+".csv";
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(u),2000);
+}
+
+// ── Logo ───────────────────────────────────────────────────────────────────────
+function Logo({h=34,w=false}){
+  const n=w?"#fff":"#313280",r=w?"rgba(255,255,255,.7)":"#A11C27",g=w?"rgba(255,255,255,.3)":"#D8D8D8";
+  return <svg width={h*3} height={h} viewBox="0 0 132 44" fill="none"><path d="M5 38 Q1 22 10 8 Q8 20 12 32 Z" fill={g}/><path d="M13 38 Q7 21 17 6 Q14 19 18 34 Z" fill={r} opacity=".9"/><path d="M21 38 Q13 21 23 4 Q19 17 23 35 Z" fill={n}/><text x="31" y="33" fontFamily="Segoe UI,sans-serif" fontWeight="800" fontSize="25" fill={n} letterSpacing="1">DDP</text></svg>;
+}
+
+// ── Micro components ───────────────────────────────────────────────────────────
+function Saved({msg="✓ Guardado en Airtable"}){return <div className="ok-b">{msg}</div>;}
+function ErrMsg({msg}){return msg?<div className="err-b">⚠ {msg}</div>:null;}
+function CT({children}){return <div className="ct"><div className="cta"/>{children}</div>;}
+function PBar({pct,color}){return <div className="ptrack"><div className="pfill" style={{width:Math.min(pct,100)+"%",background:color}}/></div>;}
+function Loading({msg="Cargando datos..."}){
+  return <div className="loading-wrap">
+    <div className="loading-logo">DDP</div>
+    <div className="loading-sub">Sistema Operativo</div>
+    <div className="spinner"/>
+    <div className="loading-msg">{msg}</div>
+  </div>;
+}
+
+// ── Login ──────────────────────────────────────────────────────────────────────
+function Login({onLogin}){
+  const[email,setEmail]=useState("");const[pass,setPass]=useState("");const[err,setErr]=useState("");const[loading,setLoading]=useState(false);
+  const handle=async()=>{
+    const u=getUsers()[email.toLowerCase()];
+    if(u&&u.password===pass){setLoading(true);onLogin({email,...u});}
+    else setErr("Credenciales incorrectas.");
+  };
+
+  return <div className="lw">
+    <div style={{position:"absolute",top:"-10%",left:"-5%",width:450,height:450,borderRadius:"50%",background:"radial-gradient(circle,rgba(49,50,128,.1) 0%,transparent 70%)",pointerEvents:"none"}}/>
+    <div className="lc">
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,marginBottom:28}}>
+        <Logo h={48}/>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:"3px",textTransform:"uppercase",color:"#8a8aaa"}}>Sistema Operativo</div>
+      </div>
+      <div style={{fontSize:13,color:"#8a8aaa",textAlign:"center",marginBottom:24,lineHeight:1.6,fontWeight:500}}>Gestión integral de operaciones<br/><span style={{color:"#313280",fontWeight:700}}>Dragados del Paraguay · Draga Taruma</span></div>
+      {err&&<div className="err-b">⚠ {err}</div>}
+      <div className="form">
+        <div><label className="lbl">Usuario</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="nombre@ddp.com"/></div>
+        <div><label className="lbl">Contraseña</label><input type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handle()} placeholder="••••••••"/></div>
+        <button className="btn btn-p" style={{width:"100%",padding:13,fontSize:14,letterSpacing:"1px",borderRadius:10}} onClick={handle} disabled={loading}>{loading?"Cargando...":"Ingresar al Sistema"}</button>
+      </div>
+      <div style={{marginTop:20,textAlign:"center",fontSize:12,color:"#8a8aaa"}}>
+        Para obtener tus credenciales de acceso<br/>contactá al administrador del sistema.
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────────────
+function Dashboard({eventos,mant,inc,alarmas,inv,navTo}){
+  const venc=mant.filter(m=>m.est==="vencido");
+  const incAb=inc.filter(i=>i.est!=="Cerrado");
+  const tonH=eventos.filter(e=>esFin(e.tipo)).reduce((s,e)=>s+(e.ton||0),0);
+  const pedidos=inv.filter(i=>i.cant<i.min&&i.min>0);
+  const ulAl=alarmas.length?alarmas[alarmas.length-1]:null;
+  const dAl=ulAl?diasHasta(ulAl.prox):null;
+
+  const alertas=[
+    ...venc.slice(0,3).map(m=>({sev:"a",msg:"MANT. VENCIDO · "+m.barco+" · "+m.tarea,page:"mantenimiento",id:m.id})),
+    ...incAb.slice(0,2).map(i=>({sev:"a",msg:"INCIDENTE ABIERTO · "+i.nro+" · "+i.desc.slice(0,50),page:"incidentes",id:i.id})),
+    ...pedidos.slice(0,2).map(i=>({sev:"a",msg:"PEDIDO URGENTE · "+i.sala+" · "+i.desc.slice(0,45),page:"inventario",id:i.id})),
+    ...(dAl!==null&&dAl<=7?[{sev:"m",msg:"ALARMAS SENTINA · Próxima en "+dAl+" días ("+ulAl.prox+")",page:"alarmas",id:null}]:[]),
+    ...(!venc.length&&!incAb.length&&!pedidos.length&&(dAl===null||dAl>7)?[{sev:"b",msg:"✓ Sin alertas críticas activas.",page:null,id:null}]:[]),
+  ];
+
+  // Calculate real efficiency per turno from eventos
+  const turnosReales=[...new Set(eventos.filter(e=>esFin(e.tipo)).map(e=>e.turno))].sort();
+  const tdatos=turnosReales.map(t=>{
+    const evT=eventos.filter(e=>esFin(e.tipo)&&e.turno===t);
+    const ton=evT.reduce((s,e)=>s+(e.ton||0),0);
+    return{l:"Turno "+t,ton,pct:0};
+  });
+  const maxTon=Math.max(...tdatos.map(t=>t.ton),1);
+  tdatos.forEach(t=>t.pct=Math.round((t.ton/maxTon)*100));
+
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Dashboard</div></div>
+    <div className="ps">{new Date().toLocaleDateString("es-PY",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
+    <div className="g4">
+      {[
+        {l:"Producción Hoy",v:tonH.toLocaleString(),u:"ton",sub:eventos.filter(e=>esFin(e.tipo)).length+" pasadas",ok:true,ac:"#313280"},
+        {l:"Total Período",v:eventos.filter(e=>esFin(e.tipo)).reduce((s,e)=>s+(e.ton||0),0).toLocaleString(),u:"ton",sub:eventos.filter(e=>esFin(e.tipo)).length+" pasadas totales",ok:true,ac:"#313280"},
+        {l:"Mant. Vencidos",v:venc.length,u:"",sub:venc.length?"Requieren acción":"Sin vencidos",ok:!venc.length,ac:venc.length?"#A11C27":"#16a34a"},
+        {l:"Pedidos Urgentes",v:pedidos.length,u:"",sub:pedidos.length?"Stock bajo mínimo":"Inventario OK",ok:!pedidos.length,ac:pedidos.length?"#A11C27":"#16a34a"},
+      ].map((k,i)=><div key={i} className="kpi" style={{borderTop:"3px solid "+k.ac}}>
+        <div className="kl">{k.l}</div><div className="kv">{k.v}<span className="ku">{k.u}</span></div>
+        <div className={k.ok?"kok":"knok"}>{k.ok?"▲":"▼"} {k.sub}</div>
+      </div>)}
+    </div>
+    <div className="g21">
+      <div className="card">
+        <CT>Alertas Activas — click para detalle</CT>
+        {alertas.map((a,i)=><div key={i} className={"alert alert-"+a.sev} onClick={()=>a.page&&navTo(a.page,a.id)}>
+          <div className={"adot adot-"+a.sev}/><span style={{fontSize:12,flex:1,fontWeight:500}}>{a.msg}</span>
+          {a.page&&<span style={{color:"#8a8aaa",fontSize:16}}>›</span>}
+        </div>)}
+      </div>
+      <div className="card">
+        <CT>Eficiencia por Turno</CT>
+        {tdatos.length===0&&<div style={{fontSize:13,color:"#8a8aaa",textAlign:"center",padding:"20px 0"}}>Sin datos de producción registrados</div>}
+      {tdatos.map((t,i)=><div key={i} style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+            <span style={{fontSize:12,fontWeight:600}}>{t.l}</span>
+            <span style={{fontSize:13,fontWeight:800,color:t.pct>=90?"#16a34a":t.pct>=80?"#d97706":"#A11C27"}}>{t.pct}%</span>
+          </div>
+          <div style={{fontSize:10,color:"#8a8aaa",marginBottom:4}}>{t.ton.toLocaleString()} ton · 4h</div>
+          <PBar pct={t.pct} color={t.pct>=90?"#16a34a":t.pct>=80?"#d97706":"#A11C27"}/>
+        </div>)}
+      </div>
+    </div>
+    <div className="card">
+      <CT>Últimos Eventos Registrados</CT>
+      {eventos.slice(0,6).map((e,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 0",borderBottom:"1px solid rgba(226,228,234,.4)"}}>
+        <div style={{fontSize:11,color:"#8a8aaa",fontWeight:700,minWidth:36}}>{fmtHora(e.ts)}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:12,fontWeight:500,color:e.tipo.includes("mantenim")?"#A11C27":"#1a1a2e"}}>{e.tipo}</div>
+          <div style={{fontSize:10,color:"#8a8aaa"}}>Turno {e.turno}</div>
+        </div>
+        {e.ton&&<div style={{fontSize:13,fontWeight:800,color:"#313280"}}>{e.ton.toLocaleString()} t</div>}
+      </div>)}
+      {!eventos.length&&<div style={{fontSize:13,color:"#8a8aaa",textAlign:"center",padding:"20px 0"}}>Sin eventos registrados hoy</div>}
+    </div>
+  </div>;
+}
+
+// ── Reporte Operativo ──────────────────────────────────────────────────────────
+function ReporteOp({eventos,setEventos,user,turnos,tipos}){
+  const iF={tsA:true,tsM:nowTs(),tipo:tipos[0]||"Inicio de dragado",turno:turnos[0]?turnos[0].id:"A",ton:"",m3:"",kd:"",kh:"",det:"",tipoCalculo:"manual",aftUllages:["","","","","",""],foreUllages:["","","","","",""],rainbowHoras:""};
+  const[form,setForm]=useState(iF);
+  const[saved,setSaved]=useState(false);
+  const[saving,setSaving]=useState(false);
+  const[errMsg,setErrMsg]=useState("");
+  const[ff,setFf]=useState("");
+  const canEdit=["gerente","capitan","oficial"].includes(user.role);
+  const isF=esFinCualquiera(form.tipo);
+  const isFinNav=esFin(form.tipo);
+  const isN=esNav(form.tipo);
+
+  const onTipoChange=t=>{
+    let tc=form.tipoCalculo;
+    if(esRainbow(t)||esFinSolo(t)) tc="rainbow";
+    setForm({...form,tipo:t,tipoCalculo:tc});
+  };
+
+  const lastRainbow=eventos.find(e=>esRainbow(e.tipo)&&e.tipo.includes("Inicio"));
+  const autoTs=form.tsA?nowTs():form.tsM;
+  let autoHoras="";
+  if(lastRainbow){
+    const diffMin=(new Date(autoTs)-new Date(lastRainbow.ts))/60000;
+    if(diffMin>0) autoHoras=(diffMin/60).toFixed(2);
+  }
+  const horasRainbow=form.rainbowHoras||autoHoras;
+  const m3Rainbow=horasRainbow>0?calcM3Rainbow(Number(horasRainbow)):0;
+
+  const updateAft=(i,v)=>{
+    const a=[...form.aftUllages];a[i]=v;
+    const r=a.every(x=>x!=="")&&form.foreUllages.every(x=>x!=="")?calcM3Bodega(a.map(Number),form.foreUllages.map(Number)):null;
+    setForm({...form,aftUllages:a,m3:r?String(r.total):""});
+  };
+  const updateFore=(i,v)=>{
+    const f=[...form.foreUllages];f[i]=v;
+    const r=form.aftUllages.every(x=>x!=="")&&f.every(x=>x!=="")?calcM3Bodega(form.aftUllages.map(Number),f.map(Number)):null;
+    setForm({...form,foreUllages:f,m3:r?String(r.total):""});
+  };
+  const bodegaRes=(form.aftUllages.every(v=>v!=="")&&form.foreUllages.every(v=>v!==""))?calcM3Bodega(form.aftUllages.map(Number),form.foreUllages.map(Number)):null;
+
+  const submit=async()=>{
+    if(!form.tipo||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={ts:form.tsA?nowTs():form.tsM,tipo:form.tipo,turno:form.turno,ton:isF&&form.ton?Number(form.ton):null,m3:isF&&form.m3?Number(form.m3):null,kd:isFinNav&&form.kd?Number(form.kd):null,kh:isFinNav&&form.kh?Number(form.kh):null,det:form.det,auto:form.tsA};
+    try{
+      const rec=await atCreate("Eventos",mappers.Eventos.to(nuevo));
+      setEventos(prev=>[{...nuevo,_id:rec.id,id:rec.id},...prev]);
+      setForm(iF);setSaved(true);setTimeout(()=>setSaved(false),3000);
+    }catch(e){setErrMsg(e.message);}
+    setSaving(false);
+  };
+
+  const evConDur=eventos.map((e,i)=>({...e,dur:i>0?duracion(e.ts,eventos[i-1].ts):null}));
+  const filtrados=ff?eventos.filter(e=>e.ts&&e.ts.startsWith(ff)):eventos;
+  const tonT=filtrados.filter(e=>esFinCualquiera(e.tipo)).reduce((s,e)=>s+(e.ton||0),0);
+  const csv=()=>exportarCSV("reporte_operativo",["Fecha y Hora","Tipo","Turno","Duracion","Ton","M3","Km Desde","Km Hasta","Detalle"],filtrados.map(e=>[fmtTsCsv(e.ts),e.tipo,e.turno,e.dur||"",e.ton||"",e.m3||"",e.kd!=null?e.kd:"",e.kh!=null?e.kh:"",e.det]));
+
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Reporte Operativo</div></div>
+    <div className="ps">Registro diario de eventos — Draga Taruma</div>
+    {canEdit&&<div className="card">
+      <CT>Registrar Evento</CT>
+      {saved&&<Saved/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r3">
+          <div><label className="lbl">Tipo de Evento</label>
+            <select value={form.tipo} onChange={e=>onTipoChange(e.target.value)}>
+              {tipos.map(t=><option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div><label className="lbl">Turno</label>
+            <select value={form.turno} onChange={e=>setForm({...form,turno:e.target.value})}>
+              {turnos.map(t=><option key={t.id} value={t.id}>{t.nombre} · {t.tripulacion}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="lbl">Timestamp</label>
+            <div style={{display:"flex",gap:7,marginBottom:!form.tsA?6:0}}>
+              <button className="btn" style={{flex:1,padding:"8px",fontSize:11,background:form.tsA?"#313280":"#fff",color:form.tsA?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:7}} onClick={()=>setForm({...form,tsA:true})}>Auto</button>
+              <button className="btn" style={{flex:1,padding:"8px",fontSize:11,background:!form.tsA?"#313280":"#fff",color:!form.tsA?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:7}} onClick={()=>setForm({...form,tsA:false})}>Manual</button>
+            </div>
+            {!form.tsA&&<input type="datetime-local" value={form.tsM} onChange={e=>setForm({...form,tsM:e.target.value})}/>}
+          </div>
+        </div>
+
+        {isF&&<div>
+          <div className="r2" style={{marginBottom:12}}>
+            <div><label className="lbl">Toneladas</label><input type="number" value={form.ton} onChange={e=>setForm({...form,ton:e.target.value})} placeholder="0"/></div>
+            <div><label className="lbl">Metodo calculo M3</label>
+              <select value={form.tipoCalculo} onChange={e=>setForm({...form,tipoCalculo:e.target.value})}>
+                <option value="rainbow">Rainbow (horas x 1000 x 0.14)</option>
+                <option value="bodega">Sondeo de bodega</option>
+                <option value="manual">Ingresar M3 manualmente</option>
+              </select>
+            </div>
+          </div>
+
+          {form.tipoCalculo==="rainbow"&&<div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"14px 16px",marginBottom:12}}>
+            <div style={{fontSize:10,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"#16a34a",marginBottom:10}}>Calculo Rainbow</div>
+            <div className="r3">
+              <div>
+                <label className="lbl">Duracion (horas)</label>
+                <input type="number" step="0.01" value={form.rainbowHoras}
+                  onChange={e=>{const h=Number(e.target.value);setForm({...form,rainbowHoras:e.target.value,m3:h>0?String(calcM3Rainbow(h)):""});}}
+                  placeholder={autoHoras||"0.00"}/>
+                {lastRainbow&&autoHoras&&!form.rainbowHoras&&<div style={{marginTop:6}}>
+                  <div style={{fontSize:10,color:"#16a34a",marginBottom:4}}>
+                    Auto desde {lastRainbow.tipo.includes("babor")?"babor":"estribor"} — {fmtHora(lastRainbow.ts)}
+                  </div>
+                  <button style={{padding:"4px 10px",background:"#16a34a",color:"#fff",border:"none",borderRadius:6,fontSize:11,cursor:"pointer"}}
+                    onClick={()=>setForm({...form,rainbowHoras:autoHoras,m3:String(calcM3Rainbow(Number(autoHoras)))})}>
+                    Usar {autoHoras}h
+                  </button>
+                </div>}
+                {!lastRainbow&&<div style={{fontSize:10,color:"#d97706",marginTop:4}}>Sin evento de inicio rainbow previo</div>}
+              </div>
+              <div style={{paddingTop:18}}>
+                <div style={{fontSize:11,color:"#8a8aaa",marginBottom:4}}>M3 calculado</div>
+                <div style={{fontSize:26,fontWeight:800,color:"#16a34a"}}>{form.m3||m3Rainbow} m3</div>
+                <div style={{fontSize:10,color:"#8a8aaa"}}>{horasRainbow||0}h x 1000 x 0.14</div>
+              </div>
+              {isFinNav&&<div>
+                <label className="lbl">Km Desde</label>
+                <input type="number" step="0.1" value={form.kd} onChange={e=>setForm({...form,kd:e.target.value})} placeholder="0.0"/>
+              </div>}
+            </div>
+          </div>}
+
+          {form.tipoCalculo==="bodega"&&<div style={{background:"#F4F5F7",borderRadius:10,padding:"14px 16px",marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"#8a8aaa",marginBottom:10}}>Bodega Popa (AFT) — Ullage cm</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:8,marginBottom:14}}>
+              {["Pt.11 PS ext","Pt.9 PS","Pt.7 PS","Pt.12 SB ext","Pt.10 SB","Pt.8 SB"].map((lb,i)=><div key={i}>
+                <label style={{fontSize:9,color:"#8a8aaa",fontWeight:700,display:"block",marginBottom:4}}>{lb}</label>
+                <input type="number" value={form.aftUllages[i]} onChange={e=>updateAft(i,e.target.value)} placeholder="—" style={{padding:"7px 8px",textAlign:"center"}}/>
+              </div>)}
+            </div>
+            <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"#8a8aaa",marginBottom:10}}>Bodega Proa (FORE) — Ullage cm</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:8,marginBottom:12}}>
+              {["Pt.5 PS","Pt.3 PS","Pt.1 PS ext","Pt.6 SB","Pt.4 SB","Pt.2 SB ext"].map((lb,i)=><div key={i}>
+                <label style={{fontSize:9,color:"#8a8aaa",fontWeight:700,display:"block",marginBottom:4}}>{lb}</label>
+                <input type="number" value={form.foreUllages[i]} onChange={e=>updateFore(i,e.target.value)} placeholder="—" style={{padding:"7px 8px",textAlign:"center"}}/>
+              </div>)}
+            </div>
+            {bodegaRes&&<div style={{display:"flex",gap:20,padding:"10px 14px",background:"#fff",borderRadius:8,border:"1px solid #E2E4EA",marginBottom:12}}>
+              <div><div style={{fontSize:9,color:"#8a8aaa",textTransform:"uppercase",letterSpacing:"1px"}}>FORE H1</div><div style={{fontSize:16,fontWeight:800,color:"#313280"}}>{bodegaRes.h1} m3</div></div>
+              <div><div style={{fontSize:9,color:"#8a8aaa",textTransform:"uppercase",letterSpacing:"1px"}}>AFT H2</div><div style={{fontSize:16,fontWeight:800,color:"#313280"}}>{bodegaRes.h2} m3</div></div>
+              <div style={{borderLeft:"2px solid #E2E4EA",paddingLeft:20}}><div style={{fontSize:9,color:"#8a8aaa",textTransform:"uppercase",letterSpacing:"1px"}}>Total</div><div style={{fontSize:22,fontWeight:800,color:"#16a34a"}}>{bodegaRes.total} m3</div></div>
+            </div>}
+            {isFinNav&&<div className="r2">
+              <div><label className="lbl">Km Desde</label><input type="number" step="0.1" value={form.kd} onChange={e=>setForm({...form,kd:e.target.value})} placeholder="0.0"/></div>
+              <div><label className="lbl">Km Hasta</label><input type="number" step="0.1" value={form.kh} onChange={e=>setForm({...form,kh:e.target.value})} placeholder="0.0"/></div>
+            </div>}
+          </div>}
+
+          {form.tipoCalculo==="manual"&&<div className="r3">
+            <div><label className="lbl">M3</label><input type="number" value={form.m3} onChange={e=>setForm({...form,m3:e.target.value})} placeholder="0"/></div>
+            {isFinNav&&<div><label className="lbl">Km Desde</label><input type="number" step="0.1" value={form.kd} onChange={e=>setForm({...form,kd:e.target.value})} placeholder="0.0"/></div>}
+            {isFinNav&&<div><label className="lbl">Km Hasta</label><input type="number" step="0.1" value={form.kh} onChange={e=>setForm({...form,kh:e.target.value})} placeholder="0.0"/></div>}
+          </div>}
+        </div>}
+
+        {!isF&&isN&&<div className="r2">
+          <div><label className="lbl">Km Desde</label><input type="number" step="0.1" value={form.kd} onChange={e=>setForm({...form,kd:e.target.value})} placeholder="0.0"/></div>
+          <div><label className="lbl">Km Hasta</label><input type="number" step="0.1" value={form.kh} onChange={e=>setForm({...form,kh:e.target.value})} placeholder="0.0"/></div>
+        </div>}
+
+        <div><label className="lbl">Detalle</label><textarea value={form.det} onChange={e=>setForm({...form,det:e.target.value})} style={{minHeight:55}} placeholder="Novedades..."/></div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Registrar Evento"}</button></div>
+      </div>
+    </div>}
+
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+        <CT>Log de Eventos</CT>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input type="date" value={ff} onChange={e=>setFf(e.target.value)} style={{width:145,padding:"7px 10px",fontSize:12}}/>
+          <button className="btn-xls" onClick={csv}>CSV</button>
+        </div>
+      </div>
+      {ff&&<div style={{fontSize:12,color:"#8a8aaa",marginBottom:11}}>{filtrados.length} eventos — {tonT.toLocaleString()} ton</div>}
+      <div className="ovfl">
+        <table>
+          <thead><tr>
+            <th>Timestamp</th><th>Tipo de Evento</th><th>Turno</th><th>Duracion</th>
+            <th>Ton.</th><th>M3</th><th>Km</th><th>Detalle</th>
+            {user.role==="gerente"&&<th></th>}
+          </tr></thead>
+          <tbody>
+          {evConDur.map((e,i)=><tr key={e._id||i} style={{background:e.tipo.includes("mantenim")?"rgba(161,28,39,.04)":"transparent"}}>
+            <td className="m">{fmtTs(e.ts)}</td>
+            <td style={{fontSize:12,fontWeight:500,color:e.tipo.includes("mantenim")?"#A11C27":"#1a1a2e"}}>{e.tipo}</td>
+            <td><span className="badge badge-n">T{e.turno}</span></td>
+            <td style={{fontWeight:600,color:e.dur?"#313280":"#8a8aaa"}}>{e.dur||"—"}</td>
+            <td style={{fontWeight:700,color:e.ton?"#313280":"#8a8aaa"}}>{e.ton?e.ton.toLocaleString():"—"}</td>
+            <td className="m">{e.m3||"—"}</td>
+            <td className="m">{e.kd!=null&&e.kh!=null?e.kd+"–"+e.kh+" km":"—"}</td>
+            <td className="m" style={{maxWidth:140}}>{e.det||"—"}</td>
+            {user.role==="gerente"&&<td><button className="btn btn-s" style={{padding:"3px 8px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async()=>{if(!window.confirm("Borrar este evento?"))return;try{if(e._id)await atDelete("Eventos",e._id);setEventos(prev=>prev.filter(x=>x._id!==e._id&&x.id!==e.id));}catch(err){alert("Error: "+err.message);}}}>x</button></td>}
+          </tr>)}
+          {!filtrados.length&&<tr><td colSpan="9" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin eventos registrados</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>;
+}
+
+function Trafico({trafico,setTrafico,user}){
+  const iF={tsA:true,tsM:nowTs(),nombre:"",tipo:"Convoy",barcazas:"",calado:"",sentido:"bajada",obs:""};
+  const[form,setForm]=useState(iF);const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const canEdit=["gerente","capitan","oficial"].includes(user.role);
+  const submit=async()=>{
+    if(!form.nombre||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={ts:form.tsA?nowTs():form.tsM,nombre:form.nombre,tipo:form.tipo,barcazas:Number(form.barcazas)||0,calado:Number(form.calado)||0,sentido:form.sentido,obs:form.obs};
+    try{const rec=await atCreate("Trafico",mappers.Trafico.to(nuevo));setTrafico(prev=>[{...nuevo,_id:rec.id,id:rec.id},...prev]);setForm(iF);setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const csv=()=>exportarCSV("trafico",["Fecha y Hora","Embarcación","Tipo","Barcazas","Calado (pies)","Sentido","Obs."],trafico.map(t=>[fmtTsCsv(t.ts),t.nombre,t.tipo,t.barcazas,t.calado,t.sentido,t.obs]));
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Tráfico del Paso</div></div>
+    <div className="ps">Registro de embarcaciones en zona de dragado</div>
+    <div className="g3">
+      {[{l:"Total",v:trafico.length,c:"#313280"},{l:"Subida",v:trafico.filter(t=>t.sentido==="subida").length,c:"#16a34a"},{l:"Bajada",v:trafico.filter(t=>t.sentido==="bajada").length,c:"#d97706"}].map((k,i)=>
+        <div key={i} className="kpi" style={{borderTop:"3px solid "+k.c}}><div className="kl">{k.l}</div><div className="kv">{k.v}</div></div>
+      )}
+    </div>
+    {canEdit&&<div className="card">
+      <CT>➕ Registrar Embarcación</CT>{saved&&<Saved/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r3">
+          <div>
+            <label className="lbl">Timestamp</label>
+            <div style={{display:"flex",gap:7,marginBottom:!form.tsA?6:0}}>
+              <button className="btn" style={{flex:1,padding:"8px",fontSize:11,background:form.tsA?"#313280":"#fff",color:form.tsA?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:7}} onClick={()=>setForm({...form,tsA:true})}>Auto</button>
+              <button className="btn" style={{flex:1,padding:"8px",fontSize:11,background:!form.tsA?"#313280":"#fff",color:!form.tsA?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:7}} onClick={()=>setForm({...form,tsA:false})}>Manual</button>
+            </div>
+            {!form.tsA&&<input type="datetime-local" value={form.tsM} onChange={e=>setForm({...form,tsM:e.target.value})}/>}
+          </div>
+          <div><label className="lbl">Nombre Embarcación</label><input value={form.nombre} onChange={e=>setForm({...form,nombre:e.target.value})} placeholder="CONV. RIO NEGRO"/></div>
+          <div><label className="lbl">Tipo</label><select value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>{["Convoy","Buque","Remolcador","Barcaza suelta","Otro"].map(t=><option key={t}>{t}</option>)}</select></div>
+        </div>
+        <div className="r3">
+          <div><label className="lbl">Barcazas</label><input type="number" value={form.barcazas} onChange={e=>setForm({...form,barcazas:e.target.value})} placeholder="0"/></div>
+          <div><label className="lbl">Calado (pies)</label><input type="number" step="0.1" value={form.calado} onChange={e=>setForm({...form,calado:e.target.value})} placeholder="0.0"/></div>
+          <div><label className="lbl">Sentido</label><select value={form.sentido} onChange={e=>setForm({...form,sentido:e.target.value})}><option value="subida">Subida</option><option value="bajada">Bajada</option></select></div>
+        </div>
+        <div><label className="lbl">Observaciones</label><textarea value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})} style={{minHeight:50}}/></div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Registrar"}</button></div>
+      </div>
+    </div>}
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><CT>🚢 Log de Tráfico</CT><button className="btn-xls" onClick={csv}>📊 CSV</button></div>
+      <table><thead><tr><th>Timestamp</th><th>Embarcación</th><th>Tipo</th><th>Barcazas</th><th>Calado (pies)</th><th>Sentido</th><th>Obs.</th>{user.role==="gerente"&&<th></th>}</tr></thead>
+        <tbody>{trafico.map((t,i)=><tr key={t._id||i}><td className="m">{fmtTs(t.ts)}</td><td style={{fontWeight:700}}>{t.nombre}</td><td><span className="badge badge-n">{t.tipo}</span></td><td>{t.barcazas||"—"}</td><td style={{fontWeight:700,color:"#313280"}}>{t.calado} pies</td><td><span className={"badge "+(t.sentido==="subida"?"badge-g":"badge-a")}>{t.sentido}</span></td><td className="m">{t.obs||"—"}</td>{user.role==="gerente"&&<td><button className="btn btn-s" style={{padding:"3px 8px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async()=>{if(!window.confirm("¿Borrar este registro de tráfico?"))return;try{if(t._id)await atDelete("Trafico",t._id);setTrafico(prev=>prev.filter(x=>x._id!==t._id));}catch(err){alert("Error: "+err.message);}}}>✕</button></td>}
+        </tr>)}
+        {!trafico.length&&<tr><td colSpan="8" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin registros</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  </div>;
+}
+
+// ── Mantenimiento ──────────────────────────────────────────────────────────────
+function Mantenimiento({mant,setMant,user,hlId}){
+  const[fB,setFB]=useState("Todos");const[fE,setFE]=useState("Todos");
+  const[form,setForm]=useState({barco:"Taruma",eq:"",tarea:"",frec:"",u:"hs",uF:"",uHs:""});
+  const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const hlRef=useRef(null);
+  useEffect(()=>{if(hlId&&hlRef.current){setTimeout(()=>{if(hlRef.current)hlRef.current.scrollIntoView({behavior:"smooth",block:"center"});},200);}},[hlId]);
+  const hA={"Taruma":5413,"Taruma II":5168,"Taruma III":147};
+  const venc=mant.filter(m=>m.est==="vencido").length;
+  const canEdit=["gerente","jefemaquina"].includes(user.role);
+  const resolver=async(m)=>{
+    const newEst=m.est==="vencido"?"ok":"vencido";
+    try{await atUpdate("Mantenimiento",m._id,{Estado:newEst});setMant(prev=>prev.map(x=>x.id===m.id?{...x,est:newEst}:x));}
+    catch(e){alert("Error al actualizar: "+e.message);}
+  };
+  const filt=mant.filter(m=>(fB==="Todos"||m.barco===fB)&&(fE==="Todos"||m.est===fE));
+  const submit=async()=>{
+    if(!form.eq||!form.tarea||saving)return;
+    setSaving(true);setErrMsg("");
+    const h=hA[form.barco]||0;const p=form.frec&&form.uHs?Number(form.uHs)+Number(form.frec):null;
+    const nuevo={barco:form.barco,eq:form.eq,tarea:form.tarea,frec:Number(form.frec)||null,u:form.u,uHs:Number(form.uHs)||null,uF:form.uF,pHs:p,est:p&&p<h?"vencido":"ok"};
+    try{const rec=await atCreate("Mantenimiento",mappers.Mantenimiento.to(nuevo));setMant(prev=>[...prev,{...nuevo,_id:rec.id,id:rec.id}]);setForm({barco:"Taruma",eq:"",tarea:"",frec:"",u:"hs",uF:"",uHs:""});setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const csv=()=>exportarCSV("mantenimiento",["Barco","Equipo","Tarea","Frec","Unidad","Última Fecha","Últ. Hs","Próximo Hs","Estado"],mant.map(m=>[m.barco,m.eq,m.tarea,m.frec||"",m.u,m.uF||"",m.uHs||"",m.pHs||"",m.est]));
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Mantenimiento</div></div>
+    <div className="ps">Plan de mantenimiento programado · Flota Taruma</div>
+    <div className="g3">
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Total Tareas</div><div className="kv">{mant.length}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid "+(venc>0?"#A11C27":"#16a34a")}}><div className="kl">Vencidos</div><div className="kv">{venc}</div><div className={venc===0?"kok":"knok"}>{venc===0?"Sin vencidos":"Requieren acción"}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid #16a34a"}}><div className="kl">Al Día</div><div className="kv">{mant.length-venc}</div></div>
+    </div>
+    {canEdit&&<div className="card">
+      <CT>➕ Agregar Tarea</CT>{saved&&<Saved msg="✓ Tarea guardada"/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r3">
+          <div><label className="lbl">Embarcación</label><select value={form.barco} onChange={e=>setForm({...form,barco:e.target.value})}>{["Taruma","Taruma II","Taruma III","Lancha"].map(b=><option key={b}>{b}</option>)}</select></div>
+          <div><label className="lbl">Equipo</label><input value={form.eq} onChange={e=>setForm({...form,eq:e.target.value})} placeholder="Motor Principal..."/></div>
+          <div><label className="lbl">Tarea</label><input value={form.tarea} onChange={e=>setForm({...form,tarea:e.target.value})} placeholder="Cambio de aceite..."/></div>
+        </div>
+        <div className="r4">
+          <div><label className="lbl">Frecuencia</label><input type="number" value={form.frec} onChange={e=>setForm({...form,frec:e.target.value})} placeholder="250..."/></div>
+          <div><label className="lbl">Unidad</label><select value={form.u} onChange={e=>setForm({...form,u:e.target.value})}><option value="hs">Horas</option><option value="mes">Meses</option></select></div>
+          <div><label className="lbl">Última Fecha</label><input type="date" value={form.uF} onChange={e=>setForm({...form,uF:e.target.value})}/></div>
+          <div><label className="lbl">Horas Últ. Mant.</label><input type="number" value={form.uHs} onChange={e=>setForm({...form,uHs:e.target.value})} placeholder="4178"/></div>
+        </div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Agregar"}</button></div>
+      </div>
+    </div>}
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+        <CT>🔧 Plan de Mantenimiento</CT>
+        <div style={{display:"flex",gap:7,alignItems:"center"}}>
+          <select style={{width:125,padding:"7px 10px",fontSize:12}} value={fB} onChange={e=>setFB(e.target.value)}>{["Todos","Taruma","Taruma II","Taruma III","Lancha"].map(o=><option key={o}>{o}</option>)}</select>
+          <select style={{width:115,padding:"7px 10px",fontSize:12}} value={fE} onChange={e=>setFE(e.target.value)}><option value="Todos">Todos</option><option value="vencido">Vencidos</option><option value="ok">Al día</option></select>
+          <button className="btn-xls" onClick={csv}>📊 CSV</button>
+        </div>
+      </div>
+      <div className="ovfl">
+        <table><thead><tr><th>Barco</th><th>Equipo</th><th>Tarea</th><th>Frec.</th><th>Última Fecha</th><th>Últ. Hs</th><th>Próximo</th><th>Estado</th>{canEdit&&<th></th>}</tr></thead>
+          <tbody>{filt.map((m,i)=>{
+            const h=hA[m.barco]||0;const r=m.pHs?m.pHs-h:null;const sc=m.est==="vencido"?"#A11C27":(r!==null&&r<200)?"#d97706":"#16a34a";const isHL=m.id===hlId;
+            return <tr key={m._id||i} ref={isHL?hlRef:null} style={{background:isHL?"rgba(217,119,6,.08)":m.est==="vencido"?"rgba(161,28,39,.04)":"transparent"}}>
+              <td><span className="badge badge-n">{m.barco}</span></td>
+              <td style={{fontSize:12}}>{m.eq}</td>
+              <td style={{fontSize:12,maxWidth:180}}>{m.tarea}{isHL&&<span className="badge badge-a" style={{marginLeft:7,fontSize:9}}>← ALERTA</span>}</td>
+              <td className="m">{m.frec?m.frec+" "+m.u:"—"}</td>
+              <td className="m">{m.uF||"—"}</td>
+              <td className="m">{m.uHs?m.uHs.toLocaleString():"—"}</td>
+              <td style={{fontWeight:700,fontSize:12,color:sc}}>{m.pHs?m.pHs.toLocaleString()+" hs":r!==null?r+" rest.":"—"}</td>
+              <td><span className="badge" style={{background:sc+"18",color:sc,border:"1px solid "+sc+"35"}}>{m.est==="vencido"?"VENCIDO":"OK"}</span></td>
+              {canEdit&&<td><button className="btn btn-s" style={{padding:"5px 10px",fontSize:11}} onClick={()=>resolver(m)}>{m.est==="vencido"?"✓ Resolver":"↩ Vencer"}</button></td>}
+              {user.role==="gerente"&&<td><button className="btn btn-s" style={{padding:"3px 8px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async()=>{if(!window.confirm("¿Borrar esta tarea?"))return;try{if(m._id)await atDelete("Mantenimiento",m._id);setMant(prev=>prev.filter(x=>x._id!==m._id));}catch(err){alert("Error: "+err.message);}}}>✕</button></td>}
+            </tr>;
+          })}
+          {!filt.length&&<tr><td colSpan="9" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin tareas</td></tr>}
+          </tbody>
+        </table>
+      </div>
+      <div style={{fontSize:10,color:"#8a8aaa",marginTop:7}}>Hs actuales: Taruma 5.413 · Taruma II 5.168 · Taruma III 147</div>
+    </div>
+  </div>;
+}
+
+// ── Incidentes ─────────────────────────────────────────────────────────────────
+function Incidentes({inc,setInc,user,hlId}){
+  const iF={fRep:"",por:user.name,a:"",fInc:"",hora:"",ub:"",op:"",parte:"",clas:"Operacional",cond:"Operativo",hPar:"",derrame:false,les:false,desc:"",causa:"",accion:"",test:""};
+  const[form,setForm]=useState(iF);const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");const[exp,setExp]=useState(null);
+  const hlRef=useRef(null);
+  useEffect(()=>{if(hlId){setExp(hlId);setTimeout(()=>{if(hlRef.current)hlRef.current.scrollIntoView({behavior:"smooth",block:"center"});},200);}},[hlId]);
+  const sevC={Operacional:"#A11C27",Seguridad:"#A11C27",Ambiental:"#d97706","Daño material":"#d97706"};
+  const clases=["Operacional","Seguridad","Ambiental","Daño material"];
+  const submit=async()=>{
+    if(!form.fInc||!form.desc||saving)return;
+    setSaving(true);setErrMsg("");
+    const nro="INC-"+new Date().getFullYear()+"-"+String(inc.length+1).padStart(3,"0");
+    const nuevo={...form,nro,hPar:Number(form.hPar)||0,est:"Abierto"};
+    try{const rec=await atCreate("Incidentes",mappers.Incidentes.to(nuevo));setInc(prev=>[{...nuevo,_id:rec.id,id:rec.id},...prev]);setForm(iF);setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const cerrar=async(i)=>{
+    const newEst=i.est==="Cerrado"?"En revisión":"Cerrado";
+    try{await atUpdate("Incidentes",i._id,{Estado:newEst});setInc(prev=>prev.map(x=>x.id===i.id?{...x,est:newEst}:x));}
+    catch(e){alert("Error: "+e.message);}
+  };
+  const pdfInc=i=>exportarPDF("REPORTE DE INCIDENTE — DRAGA TARUMA",i.nro,i.fRep,[
+    {titulo:"IDENTIFICACIÓN",tipo:"campos",campos:[["N° Reporte",i.nro],["Fecha Reporte",i.fRep],["Reportado Por",i.por],["Reportado A",i.a]]},
+    {titulo:"INFORMACIÓN DEL EVENTO",tipo:"campos",campos:[["Fecha",i.fInc],["Hora",i.hora],["Ubicación",i.ub],["Operación",i.op],["Parte del Buque",i.parte],["Clasificación",i.clas]]},
+    {titulo:"IMPACTO",tipo:"campos",campos:[["Condición Operativa",i.cond],["Horas Parada",i.hPar+" hs"],["¿Derrame?",i.derrame?"Sí":"No"],["¿Lesionados?",i.les?"Sí":"No"]]},
+    {titulo:"DESCRIPCIÓN",tipo:"texto",contenido:i.desc},
+    {titulo:"CAUSA RAÍZ",tipo:"texto",contenido:i.causa},
+    {titulo:"ACCIÓN CORRECTIVA",tipo:"texto",contenido:i.accion},
+    {titulo:"TESTIGOS",tipo:"texto",contenido:i.test},
+  ],{nombre:i.por,cargo:user.cargo});
+
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Incidentes</div></div>
+    <div className="ps">Reporte y seguimiento — Draga Taruma</div>
+    <div className="g4">
+      <div className="kpi" style={{borderTop:"3px solid "+(inc.filter(i=>i.est!=="Cerrado").length>0?"#A11C27":"#16a34a")}}><div className="kl">Abiertos</div><div className="kv">{inc.filter(i=>i.est!=="Cerrado").length}</div></div>
+      {clases.map(c=><div key={c} className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">{c}</div><div className="kv">{inc.filter(i=>i.clas===c).length}</div></div>)}
+    </div>
+    <div className="card">
+      <CT>➕ Reportar Incidente</CT>{saved&&<Saved msg="✓ Incidente guardado"/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r3">
+          <div><label className="lbl">Fecha Reporte</label><input type="date" value={form.fRep} onChange={e=>setForm({...form,fRep:e.target.value})}/></div>
+          <div><label className="lbl">Reportado Por</label><input value={form.por} onChange={e=>setForm({...form,por:e.target.value})}/></div>
+          <div><label className="lbl">Reportado A</label><input value={form.a} onChange={e=>setForm({...form,a:e.target.value})} placeholder="Capitán / Gerencia..."/></div>
+        </div>
+        <div className="r4">
+          <div><label className="lbl">Fecha Incidente</label><input type="date" value={form.fInc} onChange={e=>setForm({...form,fInc:e.target.value})}/></div>
+          <div><label className="lbl">Hora</label><input type="time" value={form.hora} onChange={e=>setForm({...form,hora:e.target.value})}/></div>
+          <div><label className="lbl">Clasificación</label><select value={form.clas} onChange={e=>setForm({...form,clas:e.target.value})}>{clases.map(c=><option key={c}>{c}</option>)}</select></div>
+          <div><label className="lbl">Cond. Operativa</label><select value={form.cond} onChange={e=>setForm({...form,cond:e.target.value})}>{["Operativo","Parada parcial","Parada total"].map(o=><option key={o}>{o}</option>)}</select></div>
+        </div>
+        <div className="r3">
+          <div><label className="lbl">Ubicación</label><input value={form.ub} onChange={e=>setForm({...form,ub:e.target.value})} placeholder="Cubierta..."/></div>
+          <div><label className="lbl">Operación</label><input value={form.op} onChange={e=>setForm({...form,op:e.target.value})} placeholder="Dragado..."/></div>
+          <div><label className="lbl">Parte del Buque</label><input value={form.parte} onChange={e=>setForm({...form,parte:e.target.value})}/></div>
+        </div>
+        <div className="r3">
+          <div><label className="lbl">Horas Parada</label><input type="number" step="0.25" value={form.hPar} onChange={e=>setForm({...form,hPar:e.target.value})} placeholder="0"/></div>
+          <div style={{display:"flex",alignItems:"center",gap:18,paddingTop:18}}>
+            <label style={{display:"flex",alignItems:"center",gap:5,fontSize:12,cursor:"pointer"}}><input type="checkbox" checked={form.derrame} onChange={e=>setForm({...form,derrame:e.target.checked})}/> ¿Derrame?</label>
+            <label style={{display:"flex",alignItems:"center",gap:5,fontSize:12,cursor:"pointer"}}><input type="checkbox" checked={form.les} onChange={e=>setForm({...form,les:e.target.checked})}/> ¿Lesionados?</label>
+          </div>
+          <div><label className="lbl">Testigos</label><input value={form.test} onChange={e=>setForm({...form,test:e.target.value})}/></div>
+        </div>
+        <div><label className="lbl">Descripción del Evento</label><textarea value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} placeholder="Qué ocurrió, cómo y dónde..."/></div>
+        <div><label className="lbl">Causa Raíz</label><textarea value={form.causa} onChange={e=>setForm({...form,causa:e.target.value})} style={{minHeight:55}}/></div>
+        <div><label className="lbl">Acción Correctiva</label><textarea value={form.accion} onChange={e=>setForm({...form,accion:e.target.value})} style={{minHeight:55}}/></div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Reportar Incidente"}</button></div>
+      </div>
+    </div>
+    {inc.map((i,idx)=>{
+      const sv=sevC[i.clas]||"#8a8aaa";const isHL=i.id===hlId;const isO=exp===i.id;
+      return <div key={i._id||idx} ref={isHL?hlRef:null} className="card" style={{cursor:"pointer",borderLeft:"4px solid "+sv,...(isHL?{borderColor:"#d97706",background:"rgba(217,119,6,.03)"}:{})}} onClick={()=>setExp(isO?null:i.id)}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:5,flexWrap:"wrap"}}>
+              <span className="badge" style={{background:sv+"18",color:sv,border:"1px solid "+sv+"35"}}>{i.clas.toUpperCase()}</span>
+              <span className="badge badge-m">{i.nro}</span>
+              <span className={"badge "+(i.est==="Cerrado"?"badge-g":"badge-a")}>{i.est}</span>
+              {isHL&&<span className="badge badge-a" style={{fontSize:9}}>← DESDE ALERTA</span>}
+            </div>
+            <div style={{fontWeight:700,marginBottom:3}}>{i.fInc} {i.hora&&"· "+i.hora}</div>
+            <div style={{fontSize:12,color:"#8a8aaa"}}>{i.desc.slice(0,100)}{i.desc.length>100?"...":""}</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:12}}>
+            <button className="btn-pdf" onClick={e=>{e.stopPropagation();pdfInc(i);}}>📄 PDF</button>
+            <div style={{color:"#8a8aaa",fontSize:18}}>{isO?"▲":"▼"}</div>
+          </div>
+        </div>
+        {isO&&<div style={{marginTop:14}}>
+          <div className="divider"/>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:11}}>
+            {[["Descripción",i.desc],["Causa Raíz",i.causa],["Acción Correctiva",i.accion],["Testigos",i.test]].map(([t,v])=>v&&
+              <div key={t}><div style={{fontSize:10,color:"#8a8aaa",letterSpacing:"1px",marginBottom:3,fontWeight:700,textTransform:"uppercase"}}>{t}</div><div style={{fontSize:13}}>{v}</div></div>
+            )}
+          </div>
+          <div style={{marginTop:12}}>
+            <button className="btn" style={{background:i.est==="Cerrado"?"#fff":"#313280",color:i.est==="Cerrado"?"#4a4a6a":"#fff",border:"1px solid #E2E4EA",fontSize:12,padding:"7px 15px",borderRadius:9}} onClick={e=>{e.stopPropagation();cerrar(i);}}>{i.est==="Cerrado"?"↩ Reabrir":"✓ Cerrar incidente"}</button>
+            {user.role==="gerente"&&<button className="btn btn-s" style={{background:"#fff",color:"#A11C27",border:"1px solid rgba(161,28,39,.3)",fontSize:12,padding:"7px 15px",borderRadius:9,marginLeft:8}} onClick={e=>{e.stopPropagation();if(!window.confirm("¿Borrar este incidente permanentemente?"))return;atDelete("Incidentes",i._id).then(()=>setInc(prev=>prev.filter(x=>x._id!==i._id))).catch(err=>alert("Error: "+err.message));}}>🗑 Borrar</button>}
+          </div>
+        </div>}
+      </div>;
+    })}
+    {!inc.length&&<div style={{textAlign:"center",color:"#8a8aaa",padding:40}}>Sin incidentes registrados</div>}
+  </div>;
+}
+
+// ── Combustible ────────────────────────────────────────────────────────────────
+function Combustible({comb,setComb,user}){
+  const[form,setForm]=useState({fecha:"",tipo:"Consumo",c24h:"",total:"",obs:""});const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const canEdit=["gerente","capitan","jefemaquina"].includes(user.role);
+  const ult=comb.length?comb[comb.length-1]:null;const nL=ult?ult.total:0;const CAP=getCapacidadCombustible();const pct=Math.min(Math.round((nL/CAP)*100),100);
+  const prom=Math.round(comb.filter(c=>c.c24h>0).reduce((s,c)=>s+c.c24h,0)/Math.max(comb.filter(c=>c.c24h>0).length,1));
+  const colN=pct>50?"#16a34a":pct>25?"#d97706":"#A11C27";
+  const submit=async()=>{
+    if(!form.fecha||!form.total||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={fecha:form.fecha,tipo:form.tipo,c24h:Number(form.c24h)||0,total:Number(form.total),obs:form.obs};
+    try{const rec=await atCreate("Combustible",mappers.Combustible.to(nuevo));setComb(prev=>[...prev,{...nuevo,_id:rec.id,id:rec.id}]);setForm({fecha:"",tipo:"Consumo",c24h:"",total:"",obs:""});setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const csv=()=>exportarCSV("combustible",["Fecha","Tipo","Consumo 24h (L)","Total (L)","Obs."],comb.map(c=>[c.fecha,c.tipo,c.c24h,c.total,c.obs]));
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Combustible</div></div>
+    <div className="ps">Control de combustible · Draga Taruma</div>
+    {pct<30&&<div className="warn-b">⚠ Nivel bajo ({pct}%). Programar carga de combustible.</div>}
+    <div className="g4">
+      <div className="kpi" style={{borderTop:"3px solid "+colN}}><div className="kl">Total a Bordo</div><div className="kv">{nL.toLocaleString()}<span className="ku">L</span></div><div className={pct>30?"kok":"knok"}>~{pct}% · {CAP.toLocaleString()} L total</div></div>
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Último Consumo</div><div className="kv">{(ult?ult.c24h:0).toLocaleString()}<span className="ku">L</span></div></div>
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Promedio/día</div><div className="kv">{prom.toLocaleString()}<span className="ku">L</span></div></div>
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Autonomía Est.</div><div className="kv">{prom>0?Math.round(nL/prom):0}<span className="ku">días</span></div></div>
+    </div>
+    {canEdit&&<div className="card">
+      <CT>➕ Registrar Movimiento</CT>{saved&&<Saved/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r4">
+          <div><label className="lbl">Fecha</label><input type="date" value={form.fecha} onChange={e=>setForm({...form,fecha:e.target.value})}/></div>
+          <div><label className="lbl">Tipo</label><select value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}><option>Consumo</option><option>Carga</option></select></div>
+          <div><label className="lbl">Consumo 24h (L)</label><input type="number" value={form.c24h} onChange={e=>setForm({...form,c24h:e.target.value})} placeholder="0"/></div>
+          <div><label className="lbl">Total a Bordo (L)</label><input type="number" value={form.total} onChange={e=>setForm({...form,total:e.target.value})} placeholder="0"/></div>
+        </div>
+        <div><label className="lbl">Observaciones</label><input value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Registrar"}</button></div>
+      </div>
+    </div>}
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><CT>📋 Historial</CT><button className="btn-xls" onClick={csv}>📊 CSV</button></div>
+      <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Consumo 24h</th><th>Total a Bordo</th><th>Observaciones</th>{user.role==="gerente"&&<th></th>}</tr></thead>
+        <tbody>{[...comb].reverse().map((c,i)=><tr key={c._id||i}>
+          <td className="m">{c.fecha}</td>
+          <td><span className={"badge "+(c.tipo==="Carga"?"badge-g":"badge-a")}>{c.tipo}</span></td>
+          <td style={{fontWeight:700,color:c.c24h>2500?"#A11C27":c.c24h>2000?"#d97706":"#1a1a2e"}}>{c.c24h.toLocaleString()} L</td>
+          <td style={{fontWeight:700,color:"#313280"}}>{c.total.toLocaleString()} L</td>
+          <td className="m">{c.obs||"—"}</td>
+        {user.role==="gerente"&&<td><button className="btn btn-s" style={{padding:"3px 8px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async()=>{if(!window.confirm("¿Borrar este registro de combustible?"))return;try{if(c._id)await atDelete("Combustible",c._id);setComb(prev=>prev.filter(x=>x._id!==c._id));}catch(err){alert("Error: "+err.message);}}}>✕</button></td>}
+        </tr>)}
+        {!comb.length&&<tr><td colSpan="6" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin registros</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  </div>;
+}
+
+// ── Logbook ────────────────────────────────────────────────────────────────────
+function Logbook({log,setLog,user}){
+  const[form,setForm]=useState({fecha:"",rpm:"",c1:"",c2:"",c3:"",c4:"",c5:"",c6:"",tc:"",htI:"",htO:"",lub:"",obs:""});
+  const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const ct=t=>t>420?"#A11C27":t>380?"#d97706":t>0?"#16a34a":"#8a8aaa";
+  const submit=async()=>{
+    if(!form.fecha||!form.rpm||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={fecha:form.fecha,rpm:+form.rpm,c1:+form.c1,c2:+form.c2,c3:+form.c3,c4:+form.c4,c5:+form.c5,c6:+form.c6,tc:+form.tc,htI:+form.htI,htO:+form.htO,lub:+form.lub,obs:form.obs};
+    try{const rec=await atCreate("Logbook",mappers.Logbook.to(nuevo));setLog(prev=>[...prev,{...nuevo,_id:rec.id,id:rec.id}]);setForm({fecha:"",rpm:"",c1:"",c2:"",c3:"",c4:"",c5:"",c6:"",tc:"",htI:"",htO:"",lub:"",obs:""});setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const csv=()=>exportarCSV("logbook_ME",["Fecha","RPM","C1","C2","C3","C4","C5","C6","Post T/C","HT In","HT Out","Lub","Obs."],log.map(l=>[l.fecha,l.rpm,l.c1,l.c2,l.c3,l.c4,l.c5,l.c6,l.tc,l.htI,l.htO,l.lub,l.obs]));
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Logbook M/E</div></div>
+    <div className="ps">Parámetros diarios Motor Principal · Draga Taruma</div>
+    <div className="card">
+      <CT>➕ Nueva Lectura</CT>{saved&&<Saved/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r2"><div><label className="lbl">Fecha</label><input type="date" value={form.fecha} onChange={e=>setForm({...form,fecha:e.target.value})}/></div><div><label className="lbl">RPM Motor Principal</label><input type="number" value={form.rpm} onChange={e=>setForm({...form,rpm:e.target.value})} placeholder="0–700"/></div></div>
+        <div style={{fontSize:11,color:"#8a8aaa",marginBottom:3,fontWeight:600}}>TEMPERATURA GAS DE ESCAPE (°C) — Normal: 350–400°C · Post T/C: 420–460°C</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:7}}>
+          {[["C1","c1"],["C2","c2"],["C3","c3"],["C4","c4"],["C5","c5"],["C6","c6"],["Post T/C","tc"]].map(([lb,k])=>
+            <div key={k}><label className="lbl">{lb}</label><input type="number" value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} placeholder="°C"/></div>
+          )}
+        </div>
+        <div className="r3">
+          <div><label className="lbl">HT Entrada (°C)</label><input type="number" value={form.htI} onChange={e=>setForm({...form,htI:e.target.value})}/></div>
+          <div><label className="lbl">HT Salida (°C)</label><input type="number" value={form.htO} onChange={e=>setForm({...form,htO:e.target.value})}/></div>
+          <div><label className="lbl">Presión Aceite (bar)</label><input type="number" step="0.1" value={form.lub} onChange={e=>setForm({...form,lub:e.target.value})}/></div>
+        </div>
+        <div><label className="lbl">Observaciones</label><textarea value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})} style={{minHeight:55}}/></div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Guardar Lectura"}</button></div>
+      </div>
+    </div>
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><CT>📊 Historial M/E</CT><button className="btn-xls" onClick={csv}>📊 CSV</button></div>
+      <div className="ovfl">
+        <table style={{minWidth:820}}><thead><tr><th>Fecha</th><th>RPM</th><th>C1</th><th>C2</th><th>C3</th><th>C4</th><th>C5</th><th>C6</th><th>Post T/C</th><th>HT In</th><th>HT Out</th><th>Lub.</th><th>Obs.</th>{user.role==="gerente"&&<th></th>}</tr></thead>
+          <tbody>{[...log].reverse().map((l,i)=><tr key={l._id||i}>
+            <td className="m">{l.fecha}</td><td style={{color:"#313280",fontWeight:700}}>{l.rpm}</td>
+            {[l.c1,l.c2,l.c3,l.c4,l.c5,l.c6].map((v,j)=><td key={j} style={{color:ct(v),fontWeight:600}}>{v}°</td>)}
+            <td style={{color:ct(l.tc),fontWeight:700}}>{l.tc}°</td>
+            <td>{l.htI}°</td><td>{l.htO}°</td>
+            <td style={{color:l.lub>=2?"#16a34a":"#d97706"}}>{l.lub}</td>
+            <td className="m">{l.obs||"—"}</td>
+          {user.role==="gerente"&&<td><button className="btn btn-s" style={{padding:"3px 8px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async()=>{if(!window.confirm("¿Borrar esta lectura?"))return;try{if(l._id)await atDelete("Logbook",l._id);setLog(prev=>prev.filter(x=>x._id!==l._id));}catch(err){alert("Error: "+err.message);}}}>✕</button></td>}
+          </tr>)}
+          {!log.length&&<tr><td colSpan="14" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin lecturas</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Alarmas ────────────────────────────────────────────────────────────────────
+function Alarmas({user,alarmas,setAlarmas}){
+  const iRows=ALARMAS_C.map((c,i)=>({id:i+1,c,prob:false,aL:"",aP:"",est:"",obs:""}));
+  const[rows,setRows]=useState(iRows);const[meta,setMeta]=useState({nro:"",fecha:"",hI:"",hF:"",inspector:user.name,cargo:user.cargo,prox:""});
+  const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const canEdit=["gerente","jefemaquina"].includes(user.role);
+  const upRow=(id,f,v)=>setRows(prev=>prev.map(r=>r.id===id?{...r,[f]:v}:r));
+  const fallas=rows.filter(r=>r.est==="Falla");
+  const ult=alarmas.length?alarmas[alarmas.length-1]:null;const dV=ult?diasHasta(ult.prox):null;
+  const guardar=async()=>{
+    if(!meta.fecha||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={...meta,rows:[...rows],fallas:fallas.map(f=>f.c)};
+    try{const rec=await atCreate("Alarmas",mappers.Alarmas.to(nuevo));setAlarmas(prev=>[...prev,{...nuevo,_id:rec.id,id:rec.id}]);setSaved(true);setTimeout(()=>setSaved(false),3000);setRows(iRows);setMeta({nro:"",fecha:"",hI:"",hF:"",inspector:user.name,cargo:user.cargo,prox:""});}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const pdfAl=ins=>exportarPDF("REPORTE INSPECCIÓN ALARMAS DE SENTINA",ins.nro,ins.fecha,[
+    {titulo:"DATOS DE LA INSPECCIÓN",tipo:"campos",campos:[["N° Reporte",ins.nro],["Fecha",ins.fecha],["Hora Inicio",ins.hI],["Hora Fin",ins.hF],["Inspector",ins.inspector],["Cargo",ins.cargo],["Próxima",ins.prox]]},
+    {titulo:"CHECKLIST DE COMPARTIMIENTOS",tipo:"tabla",cols:["N°","Compartimiento","Probado","Alarma Local","Alarma Panel","Estado","Obs."],filas:(ins.rows||[]).map((r,i)=>[i+1,r.c,r.prob?"Sí":"No",r.aL||"—",r.aP||"—",r.est||"—",r.obs||"—"])},
+    {titulo:"FALLAS DETECTADAS",tipo:"texto",contenido:(ins.fallas||[]).length?(ins.fallas||[]).join(", "):"Sin fallas."},
+  ],{nombre:ins.inspector,cargo:ins.cargo});
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Alarmas Sentina</div></div>
+    <div className="ps">Inspección mensual de alarmas — Draga Taruma</div>
+    <div className="g3">
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Inspecciones</div><div className="kv">{alarmas.length}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid "+(dV!==null&&dV<=7?"#A11C27":"#16a34a")}}><div className="kl">Próxima Inspección</div><div className="kv" style={{fontSize:18}}>{ult?ult.prox:"—"}</div><div className={dV===null||dV>7?"kok":"knok"}>{dV!==null?"En "+dV+" días":"Sin programar"}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid "+(fallas.length?"#A11C27":"#16a34a")}}><div className="kl">Fallas Últ. Insp.</div><div className="kv">{ult&&ult.fallas?ult.fallas.length:0}</div></div>
+    </div>
+    {dV!==null&&dV<=7&&<div className="warn-b">⚠ Inspección de alarmas vence en {dV} días ({ult.prox}).</div>}
+    {canEdit&&<div className="card">
+      <CT>➕ Nueva Inspección</CT>{saved&&<Saved msg="✓ Inspección guardada"/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r4">
+          <div><label className="lbl">N° Reporte</label><input value={meta.nro} onChange={e=>setMeta({...meta,nro:e.target.value})} placeholder="ALA-2026-002"/></div>
+          <div><label className="lbl">Fecha</label><input type="date" value={meta.fecha} onChange={e=>setMeta({...meta,fecha:e.target.value})}/></div>
+          <div><label className="lbl">Hora Inicio</label><input type="time" value={meta.hI} onChange={e=>setMeta({...meta,hI:e.target.value})}/></div>
+          <div><label className="lbl">Hora Fin</label><input type="time" value={meta.hF} onChange={e=>setMeta({...meta,hF:e.target.value})}/></div>
+        </div>
+        <div className="r3">
+          <div><label className="lbl">Inspector</label><input value={meta.inspector} onChange={e=>setMeta({...meta,inspector:e.target.value})}/></div>
+          <div><label className="lbl">Cargo</label><input value={meta.cargo} onChange={e=>setMeta({...meta,cargo:e.target.value})}/></div>
+          <div><label className="lbl">Próxima Inspección</label><input type="date" value={meta.prox} onChange={e=>setMeta({...meta,prox:e.target.value})}/></div>
+        </div>
+        {fallas.length>0&&<div className="warn-b">⚠ {fallas.length} falla(s): {fallas.map(f=>f.c).join(", ")}</div>}
+        <table><thead><tr><th>N°</th><th>Compartimiento</th><th>Probado</th><th>Alarma Local</th><th>Alarma Panel</th><th>Estado</th><th>Obs.</th></tr></thead>
+          <tbody>{rows.map(r=><tr key={r.id} style={{background:r.est==="Falla"?"rgba(161,28,39,.04)":"transparent"}}>
+            <td className="m">{r.id}</td>
+            <td style={{fontSize:12,fontWeight:500}}>{r.c}</td>
+            <td><input type="checkbox" checked={r.prob} onChange={e=>upRow(r.id,"prob",e.target.checked)}/></td>
+            {["aL","aP"].map(f=><td key={f}><select style={{padding:"5px 8px",fontSize:11,width:90}} value={r[f]} onChange={e=>upRow(r.id,f,e.target.value)}><option value="">—</option><option value="OK">OK</option><option value="Falla">Falla</option></select></td>)}
+            <td><select style={{padding:"5px 8px",fontSize:11,width:95}} value={r.est} onChange={e=>upRow(r.id,"est",e.target.value)}><option value="">—</option><option value="OK">OK</option><option value="Falla">Falla</option><option value="N/A">N/A</option></select></td>
+            <td><input style={{padding:"5px 8px",fontSize:11}} value={r.obs} onChange={e=>upRow(r.id,"obs",e.target.value)} placeholder="Obs..."/></td>
+          </tr>)}</tbody>
+        </table>
+        <div><button className="btn btn-p" onClick={guardar} disabled={saving}>{saving?"Guardando...":"Guardar Inspección"}</button></div>
+      </div>
+    </div>}
+    <div className="card">
+      <CT>📋 Historial de Inspecciones</CT>
+      {!alarmas.length&&<div style={{fontSize:13,color:"#8a8aaa",textAlign:"center",padding:20}}>Sin inspecciones registradas</div>}
+      {[...alarmas].reverse().map((ins,i)=><div key={ins._id||i} style={{padding:"12px 0",borderBottom:"1px solid rgba(226,228,234,.4)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div><div style={{fontWeight:700,marginBottom:2}}>{ins.nro} · {ins.fecha}</div><div style={{fontSize:12,color:"#8a8aaa"}}>Inspector: {ins.inspector} · Fallas: {ins.fallas?ins.fallas.length:0} · Próxima: {ins.prox}</div></div>
+        <div style={{display:"flex",gap:8}}>
+          {ins.fallas&&ins.fallas.length>0&&<span className="badge badge-r">FALLA</span>}
+          <button className="btn-pdf" onClick={()=>pdfAl(ins)}>📄 PDF</button>
+        </div>
+      </div>)}
+    </div>
+  </div>;
+}
+
+// ── Inventario ─────────────────────────────────────────────────────────────────
+function Inventario({inv,setInv,user,hlId}){
+  const[sala,setSala]=useState("Todos");const[bus,setBus]=useState("");const[showF,setShowF]=useState(false);
+  const[form,setForm]=useState({sala:"SALA DE FILTROS",sec:"",desc:"",cant:"",min:""});
+  const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const hlRef=useRef(null);
+  useEffect(()=>{if(hlId&&hlRef.current){setTimeout(()=>{if(hlRef.current)hlRef.current.scrollIntoView({behavior:"smooth",block:"center"});},200);}},[hlId]);
+  const canEdit=["gerente","jefemaquina"].includes(user.role);
+  const salas=[...new Set(inv.map(i=>i.sala))];
+  const pedidos=inv.filter(i=>i.cant<i.min&&i.min>0);
+  const filt=inv.filter(i=>(sala==="Todos"||i.sala===sala)&&(!bus||i.desc.toLowerCase().includes(bus.toLowerCase())||i.sec.toLowerCase().includes(bus.toLowerCase())));
+  const upCant=async(item,v)=>{
+    const n=Math.max(0,Number(v));
+    setInv(prev=>prev.map(i=>i.id===item.id?{...i,cant:n}:i));
+    try{await atUpdate("Inventario",item._id,{Cant:n});}catch(e){console.error(e);}
+  };
+  const upMin=async(item,v)=>{
+    const n=Math.max(0,Number(v));
+    setInv(prev=>prev.map(i=>i.id===item.id?{...i,min:n}:i));
+    try{await atUpdate("Inventario",item._id,{Min:n});}catch(e){console.error(e);}
+  };
+  const submit=async()=>{
+    if(!form.desc||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={sala:form.sala,sec:form.sec,desc:form.desc,cant:Number(form.cant)||0,min:Number(form.min)||0};
+    try{const rec=await atCreate("Inventario",mappers.Inventario.to(nuevo));setInv(prev=>[...prev,{...nuevo,_id:rec.id,id:rec.id}]);setForm({sala:"SALA DE FILTROS",sec:"",desc:"",cant:"",min:""});setShowF(false);setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const csv=()=>exportarCSV("inventario",["Sala","Sector","Descripción","Cant. Actual","Cant. Mínima","Estado"],inv.map(i=>[i.sala,i.sec,i.desc,i.cant,i.min,i.cant<i.min&&i.min>0?"PEDIDO":"OK"]));
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Inventario</div></div>
+    <div className="ps">Stock de repuestos · Draga Taruma · {inv.length} ítems</div>
+    {pedidos.length>0&&<div className="warn-b">⚠ {pedidos.length} ítem(s) bajo mínimo: {pedidos.slice(0,3).map(i=>i.desc.slice(0,25)).join(", ")}{pedidos.length>3?"...":""}</div>}
+    <div className="g3">
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Total Ítems</div><div className="kv">{inv.length}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid "+(pedidos.length?"#A11C27":"#16a34a")}}><div className="kl">Pedidos Urgentes</div><div className="kv">{pedidos.length}</div><div className={pedidos.length===0?"kok":"knok"}>{pedidos.length?"Stock bajo mínimo":"Inventario OK"}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid #16a34a"}}><div className="kl">Stock OK</div><div className="kv">{inv.length-pedidos.length}</div></div>
+    </div>
+    <div style={{display:"flex",gap:9,marginBottom:13,alignItems:"center",flexWrap:"wrap"}}>
+      <input style={{flex:1,minWidth:180,padding:"9px 12px"}} value={bus} onChange={e=>setBus(e.target.value)} placeholder="Buscar ítem, código..."/>
+      <select style={{width:190,padding:"9px 12px"}} value={sala} onChange={e=>setSala(e.target.value)}><option value="Todos">Todas las salas</option>{salas.map(s=><option key={s}>{s}</option>)}</select>
+      {canEdit&&<button className="btn btn-p" style={{padding:"9px 15px"}} onClick={()=>setShowF(!showF)}>+ Ítem</button>}
+      <button className="btn-xls" onClick={csv}>📊 CSV</button>
+    </div>
+    {showF&&canEdit&&<div className="card">
+      <CT>➕ Nuevo Ítem</CT>{saved&&<Saved msg="✓ Ítem guardado"/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r3">
+          <div><label className="lbl">Sala</label><select value={form.sala} onChange={e=>setForm({...form,sala:e.target.value})}>{salas.map(s=><option key={s}>{s}</option>)}</select></div>
+          <div><label className="lbl">Sector</label><input value={form.sec} onChange={e=>setForm({...form,sec:e.target.value})} placeholder="GAB. 1, ESTANTE 2..."/></div>
+          <div><label className="lbl">Descripción</label><input value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} placeholder="Nombre y código..."/></div>
+        </div>
+        <div className="r2">
+          <div><label className="lbl">Cantidad Actual</label><input type="number" value={form.cant} onChange={e=>setForm({...form,cant:e.target.value})} placeholder="0"/></div>
+          <div><label className="lbl">Cantidad Mínima</label><input type="number" value={form.min} onChange={e=>setForm({...form,min:e.target.value})} placeholder="0"/></div>
+        </div>
+        <div style={{display:"flex",gap:9}}><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Agregar"}</button><button className="btn btn-s" onClick={()=>setShowF(false)}>Cancelar</button></div>
+      </div>
+    </div>}
+    {salas.filter(s=>sala==="Todos"||s===sala).map(sl=>{
+      const items=filt.filter(i=>i.sala===sl);if(!items.length)return null;
+      const pedSala=items.filter(i=>i.cant<i.min&&i.min>0).length;
+      return <div key={sl} className="card">
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div className="ct"><div className="cta"/>{sl}{pedSala>0&&<span className="badge badge-r" style={{marginLeft:7,fontSize:9}}>{pedSala} PEDIDO{pedSala>1?"S":""}</span>}</div>
+          <span style={{fontSize:11,color:"#8a8aaa"}}>{items.length} ítems</span>
+        </div>
+        <table><thead><tr><th>Sector</th><th>Descripción</th><th>Actual</th><th>Mínimo</th><th>Alerta</th>{canEdit&&<th>Ajustar</th>}</tr></thead>
+          <tbody>{items.map((i,idx)=>{
+            const bajo=i.min>0&&i.cant<i.min;const isHL=i.id===hlId;
+            return <tr key={i._id||idx} ref={isHL?hlRef:null} style={{background:isHL?"rgba(217,119,6,.08)":bajo?"rgba(161,28,39,.04)":"transparent"}}>
+              <td className="m">{i.sec||"—"}</td>
+              <td style={{fontSize:12,fontWeight:bajo?700:400,color:bajo?"#A11C27":"#1a1a2e"}}>{i.desc}{isHL&&<span className="badge badge-a" style={{marginLeft:7,fontSize:9}}>← ALERTA</span>}</td>
+              <td style={{fontWeight:800,fontSize:15,color:bajo?"#A11C27":"#16a34a"}}>{i.cant}</td>
+              <td className="m">{i.min>0?i.min:"—"}</td>
+              <td>{bajo?<span className="badge badge-r">PEDIDO</span>:i.min>0?<span className="badge badge-g">OK</span>:<span className="badge badge-m">S/Min</span>}</td>
+              {canEdit&&<td>
+                <div style={{display:"flex",gap:4,alignItems:"center"}}>
+                  <button className="btn btn-s" style={{padding:"3px 7px",fontSize:12}} onClick={()=>upCant(i,i.cant-1)}>−</button>
+                  <span style={{fontWeight:700,minWidth:22,textAlign:"center"}}>{i.cant}</span>
+                  <button className="btn btn-s" style={{padding:"3px 7px",fontSize:12}} onClick={()=>upCant(i,i.cant+1)}>+</button>
+                  <input type="number" style={{width:45,padding:"4px 6px",fontSize:11}} placeholder="min" defaultValue={i.min} onBlur={e=>upMin(i,e.target.value)}/>
+                  <button className="btn btn-s" style={{padding:"3px 7px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)",marginLeft:4}} onClick={async()=>{if(!window.confirm("¿Borrar este ítem del inventario?"))return;try{if(i._id)await atDelete("Inventario",i._id);setInv(prev=>prev.filter(x=>x._id!==i._id));}catch(err){alert("Error: "+err.message);}}}>✕</button>
+                </div>
+              </td>}
+            </tr>;
+          })}</tbody>
+        </table>
+      </div>;
+    })}
+  </div>;
+}
+
+// ── Reuniones ──────────────────────────────────────────────────────────────────
+function Reuniones({reu,setReu,user}){
+  const[form,setForm]=useState({fecha:"",asist:"",temas:"",acuerdos:"",resp:""});const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");const[exp,setExp]=useState(null);
+  const submit=async()=>{
+    if(!form.fecha||!form.temas||saving)return;
+    setSaving(true);setErrMsg("");
+    try{const rec=await atCreate("Reuniones",mappers.Reuniones.to(form));setReu(prev=>[...prev,{...form,_id:rec.id,id:rec.id}]);setForm({fecha:"",asist:"",temas:"",acuerdos:"",resp:""});setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const pdfR=r=>exportarPDF("ACTA DE REUNIÓN DE TRIPULACIÓN",String(r.id||""),r.fecha,[{titulo:"DATOS",tipo:"campos",campos:[["Fecha",r.fecha],["Asistentes",r.asist]]},{titulo:"TEMAS TRATADOS",tipo:"texto",contenido:r.temas},{titulo:"ACUERDOS",tipo:"texto",contenido:r.acuerdos},{titulo:"RESPONSABLES",tipo:"texto",contenido:r.resp}],{nombre:user.name,cargo:user.cargo});
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Reuniones</div></div>
+    <div className="ps">Actas de reuniones de tripulación</div>
+    <div className="card"><CT>➕ Nueva Acta</CT>{saved&&<Saved msg="✓ Acta guardada"/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div><label className="lbl">Fecha</label><input type="date" value={form.fecha} onChange={e=>setForm({...form,fecha:e.target.value})}/></div>
+        <div><label className="lbl">Asistentes</label><input value={form.asist} onChange={e=>setForm({...form,asist:e.target.value})} placeholder="Nombres..."/></div>
+        <div><label className="lbl">Temas Tratados</label><textarea value={form.temas} onChange={e=>setForm({...form,temas:e.target.value})}/></div>
+        <div><label className="lbl">Acuerdos y Decisiones</label><textarea value={form.acuerdos} onChange={e=>setForm({...form,acuerdos:e.target.value})}/></div>
+        <div><label className="lbl">Responsables</label><input value={form.resp} onChange={e=>setForm({...form,resp:e.target.value})}/></div>
+        <div><button className="btn btn-p" onClick={submit} disabled={saving}>{saving?"Guardando...":"Guardar Acta"}</button></div>
+      </div>
+    </div>
+    {[...reu].reverse().map((r,i)=><div key={r._id||i} className="card" style={{cursor:"pointer"}} onClick={()=>setExp(exp===r.id?null:r.id)}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div><div style={{fontWeight:700,marginBottom:2}}>Reunión — {r.fecha}</div><div style={{fontSize:12,color:"#8a8aaa"}}>{r.asist}</div></div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <button className="btn-pdf" onClick={e=>{e.stopPropagation();pdfR(r);}}>📄 PDF</button>
+          {user.role==="gerente"&&<button className="btn btn-s" style={{padding:"4px 9px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async e=>{e.stopPropagation();if(!window.confirm("¿Borrar esta acta?"))return;try{if(r._id)await atDelete("Reuniones",r._id);setReu(prev=>prev.filter(x=>x._id!==r._id));}catch(err){alert("Error: "+err.message);}}}>✕</button>}
+          <div style={{color:"#8a8aaa",fontSize:18}}>{exp===r.id?"▲":"▼"}</div>
+        </div>
+      </div>
+      {exp===r.id&&<div style={{marginTop:12}}>
+        <div className="divider"/>
+        {[["📌 Temas",r.temas],["✅ Acuerdos",r.acuerdos],["👤 Responsables",r.resp]].map(([t,v])=>v&&<div key={t} style={{marginBottom:9}}><div style={{fontSize:10,color:"#8a8aaa",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:3}}>{t}</div><div style={{fontSize:13}}>{v}</div></div>)}
+      </div>}
+    </div>)}
+    {!reu.length&&<div style={{textAlign:"center",color:"#8a8aaa",padding:40}}>Sin actas registradas</div>}
+  </div>;
+}
+
+// ── Actas de Mando ─────────────────────────────────────────────────────────────
+function Actas({user,actas,setActas}){
+  const[tipo,setTipo]=useState("capitan");const[form,setForm]=useState({fecha:"",zona:"",sal:"",ent:"",obs:""});
+  const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const sisSal=["Bomba de Dragado","Motor Principal","Reductores","Generadores Auxiliares","Sistema Hidráulico","Sistema Eléctrico","Sistema de Refrigeración","Sistema de Combustible","Sistema de Lubricación","Compresores / Aire de Servicio"];
+  const[sis,setSis]=useState(sisSal.map(s=>({s,est:"",obs:""})));
+  const chkSal=["Sistema de Dragado Operativo","Bomba Principal","Propulsión Principal","Generadores Auxiliares","Sistema Hidráulico","Sistema Eléctrico","Instrumentación y GPS","Sistema de Comunicación","Stock de Repuestos Críticos","Documentación y Certificados"];
+  const[chk,setChk]=useState(chkSal.map(s=>({s,est:"",obs:""})));
+  const guardar=async()=>{
+    if(!form.fecha||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={tipo,fecha:form.fecha,zona:form.zona,sal:form.sal,ent:form.ent,sistemas:sis,checklist:chk,obs:form.obs};
+    try{const rec=await atCreate("ActasMando",mappers.ActasMando.to(nuevo));setActas(prev=>[...prev,{...nuevo,_id:rec.id,id:rec.id}]);setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+  const pdfActa=()=>{
+    const titulo=tipo==="capitan"?"ACTA DE ENTREGA DE MANDO — CAPITÁN":"ACTA DE ENTREGA DE MANDO — JEFE DE MÁQUINAS";
+    exportarPDF(titulo,"",form.fecha,[
+      {titulo:"DATOS GENERALES",tipo:"campos",campos:[["Fecha y Hora",form.fecha],["Zona de Operación",form.zona],[tipo==="capitan"?"Capitán Saliente":"J.M. Saliente",form.sal],[tipo==="capitan"?"Capitán Entrante":"J.M. Entrante",form.ent]]},
+      {titulo:"ESTADO GENERAL DE SISTEMAS",tipo:"tabla",cols:["Sistema","Estado","Observaciones"],filas:sis.map(s=>[s.s,s.est||"—",s.obs||"—"])},
+      ...(tipo==="capitan"?[{titulo:"CHECKLIST OPERATIVO",tipo:"tabla",cols:["Ítem","Estado","Obs."],filas:chk.map(c=>[c.s,c.est||"—",c.obs||"—"])}]:[]),
+      {titulo:"OBSERVACIONES",tipo:"texto",contenido:form.obs},
+    ],{nombre:form.sal,cargo:tipo==="capitan"?"Capitán Saliente":"J.M. Saliente"});
+  };
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Actas de Mando</div></div>
+    <div className="ps">Entrega de mando — Draga Taruma</div>
+    <div style={{display:"flex",gap:9,marginBottom:18}}>
+      {[["capitan","Capitán"],["jefemaquina","Jefe de Máquinas"]].map(([k,lb])=>
+        <button key={k} className="btn" style={{padding:"10px 18px",background:tipo===k?"#313280":"#fff",color:tipo===k?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:9}} onClick={()=>setTipo(k)}>{lb}</button>
+      )}
+    </div>
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><CT>{tipo==="capitan"?"Capitán":"Jefe de Máquinas"}</CT><button className="btn-pdf" onClick={pdfActa}>📄 Generar PDF</button></div>
+      {saved&&<Saved msg="✓ Acta guardada"/>}<ErrMsg msg={errMsg}/>
+      <div className="form">
+        <div className="r2"><div><label className="lbl">Fecha y Hora</label><input type="datetime-local" value={form.fecha} onChange={e=>setForm({...form,fecha:e.target.value})}/></div><div><label className="lbl">Zona de Operación</label><input value={form.zona} onChange={e=>setForm({...form,zona:e.target.value})} placeholder="Río Bermejo, km 12..."/></div></div>
+        <div className="r2"><div><label className="lbl">{tipo==="capitan"?"Capitán Saliente":"J.M. Saliente"}</label><input value={form.sal} onChange={e=>setForm({...form,sal:e.target.value})}/></div><div><label className="lbl">{tipo==="capitan"?"Capitán Entrante":"J.M. Entrante"}</label><input value={form.ent} onChange={e=>setForm({...form,ent:e.target.value})}/></div></div>
+        <div className="divider"/>
+        <div style={{fontSize:10,color:"#8a8aaa",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:9}}>Estado General de Sistemas</div>
+        <table><thead><tr><th>Sistema</th><th>Estado</th><th>Observaciones</th></tr></thead>
+          <tbody>{sis.map((s,i)=><tr key={i}><td style={{fontSize:12,fontWeight:500}}>{s.s}</td><td><select style={{padding:"6px 10px",fontSize:12,width:175}} value={s.est} onChange={e=>setSis(prev=>prev.map((x,j)=>j===i?{...x,est:e.target.value}:x))}><option value="">—</option><option value="OK">OK</option><option value="Restricción">Restricción</option><option value="Fuera de Servicio">Fuera de Servicio</option></select></td><td><input style={{padding:"6px 10px",fontSize:12}} value={s.obs} onChange={e=>setSis(prev=>prev.map((x,j)=>j===i?{...x,obs:e.target.value}:x))} placeholder="Obs..."/></td></tr>)}</tbody>
+        </table>
+        {tipo==="capitan"&&<>
+          <div className="divider"/>
+          <div style={{fontSize:10,color:"#8a8aaa",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:9}}>Checklist Operativo</div>
+          <table><thead><tr><th>Ítem</th><th>Estado</th><th>Obs.</th></tr></thead>
+            <tbody>{chk.map((c,i)=><tr key={i}><td style={{fontSize:12,fontWeight:500}}>{c.s}</td><td><select style={{padding:"6px 10px",fontSize:12,width:155}} value={c.est} onChange={e=>setChk(prev=>prev.map((x,j)=>j===i?{...x,est:e.target.value}:x))}><option value="">—</option><option value="OK">OK</option><option value="Observación">Observación</option></select></td><td><input style={{padding:"6px 10px",fontSize:12}} value={c.obs} onChange={e=>setChk(prev=>prev.map((x,j)=>j===i?{...x,obs:e.target.value}:x))} placeholder="..."/></td></tr>)}</tbody>
+          </table>
+        </>}
+        <div><label className="lbl">Observaciones del Saliente</label><textarea value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></div>
+        <div style={{display:"flex",gap:9}}>
+          <button className="btn btn-p" onClick={guardar} disabled={saving}>{saving?"Guardando...":"Guardar Acta"}</button>
+          <button className="btn-pdf" onClick={pdfActa}>📄 Generar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Reporte Semanal ────────────────────────────────────────────────────────────
+function RepSemanal({user}){
+  const sSals=["Sistema de Dragado","Propulsión Principal","Generadores Auxiliares","Sistema Hidráulico","Sistema Eléctrico","Instrumentación","Casco / Estructura"];
+  const[form,setForm]=useState({fecha:"",lugar:"",mant:"",log:"",inc:"No",descI:"",cambio:"No",fCambio:"",persCambio:"",coment:"",part:""});
+  const[sis,setSis]=useState(sSals.map(s=>({s,com:""})));const[saved,setSaved]=useState(false);
+  const pdf=()=>exportarPDF("REPORTE SEMANAL TÉCNICO OPERATIVO — DRAGA TARUMA","",form.fecha,[
+    {titulo:"IDENTIFICACIÓN",tipo:"campos",campos:[["Fecha",form.fecha],["Lugar de Operación",form.lugar]]},
+    {titulo:"CONDICIÓN GENERAL DE LA MÁQUINA",tipo:"tabla",cols:["Sistema","Comentarios"],filas:sis.map(s=>[s.s,s.com||"—"])},
+    {titulo:"MANTENIMIENTO",tipo:"texto",contenido:form.mant},
+    {titulo:"LOGÍSTICA Y REPUESTOS",tipo:"texto",contenido:form.log},
+    {titulo:"DAÑOS / INCIDENTES",tipo:"campos",campos:[["¿Existieron?",form.inc],["Descripción",form.descI]]},
+    {titulo:"CAMBIO DE TRIPULACIÓN",tipo:"campos",campos:[["¿Cambio Previsto?",form.cambio],["Fecha Prevista",form.fCambio],["Personal",form.persCambio]]},
+    {titulo:"COMENTARIOS FINALES",tipo:"texto",contenido:form.coment},
+    {titulo:"PARTICIPANTES",tipo:"texto",contenido:form.part},
+  ],{nombre:user.name,cargo:user.cargo});
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Reporte Semanal</div></div>
+    <div className="ps">Reporte Técnico Operativo Semanal — Draga Taruma</div>
+    <div className="card">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><CT>📋 Weekly Technical Report</CT><button className="btn-pdf" onClick={pdf}>📄 Generar PDF</button></div>
+      {saved&&<Saved/>}
+      <div className="form">
+        <div className="r2"><div><label className="lbl">Fecha</label><input type="date" value={form.fecha} onChange={e=>setForm({...form,fecha:e.target.value})}/></div><div><label className="lbl">Lugar de Operación</label><input value={form.lugar} onChange={e=>setForm({...form,lugar:e.target.value})} placeholder="Río Bermejo, km..."/></div></div>
+        <div style={{fontSize:10,color:"#8a8aaa",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:7}}>2. Condición General de la Máquina</div>
+        {sis.map((s,i)=><div key={i} style={{display:"grid",gridTemplateColumns:"1.2fr 2fr",gap:11,marginBottom:7,alignItems:"center"}}><div style={{fontSize:12,fontWeight:600}}>{s.s}</div><input style={{padding:"8px 11px"}} value={s.com} onChange={e=>setSis(prev=>prev.map((x,j)=>j===i?{...x,com:e.target.value}:x))} placeholder="Estado..."/></div>)}
+        <div className="divider"/>
+        <div><label className="lbl">3. Mantenimiento</label><textarea value={form.mant} onChange={e=>setForm({...form,mant:e.target.value})} placeholder="Intervenciones ejecutadas y pendientes..."/></div>
+        <div><label className="lbl">4. Logística y Repuestos</label><textarea value={form.log} onChange={e=>setForm({...form,log:e.target.value})} placeholder="Pedidos emitidos, en espera..."/></div>
+        <div className="r2">
+          <div><label className="lbl">6. ¿Incidentes?</label><select value={form.inc} onChange={e=>setForm({...form,inc:e.target.value})}><option>No</option><option>Sí</option></select></div>
+          {form.inc==="Sí"&&<div><label className="lbl">Descripción</label><input value={form.descI} onChange={e=>setForm({...form,descI:e.target.value})}/></div>}
+        </div>
+        <div className="r3">
+          <div><label className="lbl">7. ¿Cambio Tripulación?</label><select value={form.cambio} onChange={e=>setForm({...form,cambio:e.target.value})}><option>No</option><option>Sí</option></select></div>
+          {form.cambio==="Sí"&&<><div><label className="lbl">Fecha</label><input type="date" value={form.fCambio} onChange={e=>setForm({...form,fCambio:e.target.value})}/></div><div><label className="lbl">Personal</label><input value={form.persCambio} onChange={e=>setForm({...form,persCambio:e.target.value})}/></div></>}
+        </div>
+        <div><label className="lbl">8. Comentarios Finales</label><textarea value={form.coment} onChange={e=>setForm({...form,coment:e.target.value})}/></div>
+        <div><label className="lbl">9. Participantes</label><input value={form.part} onChange={e=>setForm({...form,part:e.target.value})} placeholder="Nombres y cargos..."/></div>
+        <div style={{display:"flex",gap:9}}><button className="btn btn-p" onClick={()=>{setSaved(true);setTimeout(()=>setSaved(false),3000);}}>Guardar</button><button className="btn-pdf" onClick={pdf}>📄 Generar PDF</button></div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Usuarios ────────────────────────────────────────────────────────────────────
+function Usuarios(){
+  const ROLES_OPTIONS=[{v:"gerente",l:"Gerencia"},{v:"capitan",l:"Capitán"},{v:"oficial",l:"Oficial"},{v:"jefemaquina",l:"Jefe de Máquinas"}];
+  const[users,setUsers]=useState(()=>getUsers());
+  const[form,setForm]=useState({email:"",password:"",role:"capitan",name:"",cargo:""});
+  const[saved,setSaved]=useState(false);const[errMsg,setErrMsg]=useState("");
+
+  const addUser=()=>{
+    if(!form.email||!form.password||!form.name)return setErrMsg("Email, nombre y contraseña son obligatorios.");
+    if(form.email==="jschebela@ddp.com.py")return setErrMsg("No se puede modificar el usuario maestro.");
+    const newUsers={...users,[form.email.toLowerCase()]:{password:form.password,role:form.role,name:form.name,cargo:form.cargo||ROLES_OPTIONS.find(r=>r.v===form.role)?.l}};
+    saveUsers(newUsers);setUsers(getUsers());
+    setForm({email:"",password:"",role:"capitan",name:"",cargo:""});
+    setSaved(true);setTimeout(()=>setSaved(false),3000);setErrMsg("");
+  };
+
+  const deleteUser=email=>{
+    if(email==="jschebela@ddp.com.py")return alert("No se puede borrar el usuario maestro.");
+    if(!window.confirm("¿Eliminar el usuario "+email+"?"))return;
+    const newUsers={...users};delete newUsers[email];
+    saveUsers(newUsers);setUsers(getUsers());
+  };
+
+  const roleColor={gerente:"badge-n",capitan:"badge-r",oficial:"badge-a",jefemaquina:"badge-m"};
+
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Gestión de Usuarios</div></div>
+    <div className="ps">Crear y eliminar usuarios del sistema — Solo Gerencia</div>
+
+    <div className="card">
+      <CT>➕ Crear Nuevo Usuario</CT>
+      {saved&&<Saved msg="✓ Usuario guardado"/>}
+      {errMsg&&<ErrMsg msg={errMsg}/>}
+      <div className="form">
+        <div className="r2">
+          <div><label className="lbl">Email (usuario de acceso)</label><input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="usuario@ddp.com.py"/></div>
+          <div><label className="lbl">Contraseña</label><input type="text" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="contraseña123"/></div>
+        </div>
+        <div className="r3">
+          <div><label className="lbl">Nombre completo</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Nombre Apellido"/></div>
+          <div><label className="lbl">Rol</label>
+            <select value={form.role} onChange={e=>setForm({...form,role:e.target.value})}>
+              {ROLES_OPTIONS.map(r=><option key={r.v} value={r.v}>{r.l}</option>)}
+            </select>
+          </div>
+          <div><label className="lbl">Cargo (opcional)</label><input value={form.cargo} onChange={e=>setForm({...form,cargo:e.target.value})} placeholder="Capitán Taruma..."/></div>
+        </div>
+        <div><button className="btn btn-p" onClick={addUser}>Crear Usuario</button></div>
+      </div>
+    </div>
+
+    <div className="card">
+      <CT>👤 Usuarios Activos</CT>
+      <table>
+        <thead><tr><th>Email</th><th>Nombre</th><th>Rol</th><th>Cargo</th><th></th></tr></thead>
+        <tbody>
+          {Object.entries(users).map(([email,u])=><tr key={email}>
+            <td style={{fontWeight:600,fontSize:12}}>{email}</td>
+            <td>{u.name}</td>
+            <td><span className={"badge "+(roleColor[u.role]||"badge-m")}>{u.role}</span></td>
+            <td className="m">{u.cargo||"—"}</td>
+            <td>{email!=="jschebela@ddp.com.py"
+              ?<button className="btn btn-s" style={{padding:"4px 10px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={()=>deleteUser(email)}>✕ Eliminar</button>
+              :<span style={{fontSize:11,color:"#8a8aaa"}}>🔒 Maestro</span>}
+            </td>
+          </tr>)}
+        </tbody>
+      </table>
+      <div style={{fontSize:11,color:"#8a8aaa",marginTop:10}}>
+        Los usuarios se guardan localmente en este dispositivo. Para que funcionen en otro dispositivo, crearlos también desde allí.
+      </div>
+    </div>
+  </div>;
+}
+
+
+// ── CapacidadConfig ─────────────────────────────────────────────────────────────
+function CapacidadConfig(){
+  const[cap,setCap]=useState(()=>getCapacidadCombustible());
+  const[saved,setSaved]=useState(false);
+  const save=()=>{
+    if(!cap||cap<1000)return;
+    setCapacidadCombustible(cap);
+    setSaved(true);setTimeout(()=>setSaved(false),3000);
+  };
+  return <div>
+    {saved&&<Saved msg="✓ Capacidad guardada"/>}
+    <div className="r2">
+      <div>
+        <label className="lbl">Capacidad total del tanque (litros)</label>
+        <input type="number" value={cap} onChange={e=>setCap(Number(e.target.value))} placeholder="75000" step="1000"/>
+        <div style={{fontSize:11,color:"#8a8aaa",marginTop:5}}>Actualmente: {getCapacidadCombustible().toLocaleString()} L</div>
+      </div>
+      <div style={{display:"flex",alignItems:"flex-end"}}>
+        <button className="btn btn-p" style={{width:"auto",padding:"10px 20px"}} onClick={save}>Guardar</button>
+      </div>
+    </div>
+  </div>;
+}
+
+
+// ── Configuración ──────────────────────────────────────────────────────────────
+function Config({turnos,setTurnos,tipos,setTipos}){
+  const[nT,setNT]=useState({nombre:"",tri:""});const[nTipo,setNTipo]=useState("");const[st,setSt]=useState(false);const[se,setSe]=useState(false);
+  const addT=()=>{if(!nT.nombre)return;setTurnos(prev=>[...prev,{id:Date.now(),nombre:nT.nombre,tripulacion:nT.tri}]);setNT({nombre:"",tri:""});setSt(true);setTimeout(()=>setSt(false),3000);};
+  const addTipo=()=>{if(!nTipo||tipos.includes(nTipo))return;setTipos(prev=>[...prev,nTipo]);setNTipo("");setSe(true);setTimeout(()=>setSe(false),3000);};
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Configuración</div></div>
+    <div className="ps">Solo accesible para Gerencia</div>
+    <div className="g2">
+      <div className="card"><CT>⛽ Capacidad de Combustible</CT>
+      <CapacidadConfig/>
+    </div>
+    <div className="card"><CT>👥 Turnos y Tripulación</CT>
+        {st&&<Saved msg="✓ Turno agregado"/>}
+        <div style={{display:"flex",gap:7,marginBottom:13}}>
+          <input style={{flex:1}} value={nT.nombre} onChange={e=>setNT({...nT,nombre:e.target.value})} placeholder="Turno A..."/>
+          <input style={{flex:2}} value={nT.tri} onChange={e=>setNT({...nT,tri:e.target.value})} placeholder="Vera / López"/>
+          <button className="btn btn-p" style={{flexShrink:0,padding:"10px 13px"}} onClick={addT}>+</button>
+        </div>
+        <table><thead><tr><th>Turno</th><th>Tripulación</th><th></th></tr></thead>
+          <tbody>{turnos.map(t=><tr key={t.id}><td style={{fontWeight:700}}>{t.nombre}</td><td className="m">{t.tripulacion}</td><td><button className="btn btn-s" style={{padding:"4px 9px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={()=>setTurnos(prev=>prev.filter(x=>x.id!==t.id))}>✕</button></td></tr>)}</tbody>
+        </table>
+      </div>
+      <div className="card"><CT>📋 Tipos de Evento</CT>
+        {se&&<Saved msg="✓ Tipo agregado"/>}
+        <div style={{display:"flex",gap:7,marginBottom:13}}><input style={{flex:1}} value={nTipo} onChange={e=>setNTipo(e.target.value)} placeholder="Nuevo tipo de evento..."/><button className="btn btn-p" style={{flexShrink:0,padding:"10px 13px"}} onClick={addTipo}>+</button></div>
+        <div style={{display:"flex",flexDirection:"column",gap:5}}>
+          {tipos.map((t,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 11px",background:"#F4F5F7",borderRadius:7,border:"1px solid #E2E4EA"}}>
+            <span style={{fontSize:12,fontWeight:500}}>{t}</span>
+            <button style={{background:"none",border:"none",color:"rgba(161,28,39,.7)",cursor:"pointer",fontSize:13}} onClick={()=>setTipos(prev=>prev.filter(x=>x!==t))}>✕</button>
+          </div>)}
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Procedimientos ─────────────────────────────────────────────────────────────
+const PROCS=[
+  {id:"p01",cat:"Operación",titulo:"1. Arranque del Sistema de Chorro",pasos:[
+    "Iniciar la ventilación de la sala de bombas.",
+    "Arrancar el sistema hidráulico. Tras 3 min de calentamiento el motor se pone en marcha y el sistema hidráulico está listo.",
+    "La válvula de aspiración de la bomba de chorro debe estar SIEMPRE cerrada cuando no se usa. Abrirla primero.",
+    "Asegurar que al menos 1 válvula de presión esté abierta. Usar cualquier cañón de chorro para esto.",
+    "Arrancar el motor. Hacer funcionar a máx. 750 rpm hasta que la temperatura del aceite alcance 50°C.",
+    "⚠ Presión mínima del chorro para el dragado: 6 bar. Presión máxima del sistema: 8 bar.",
+  ]},
+  {id:"p02",cat:"Operación",titulo:"2. Puesta en Marcha — Proceso de Succión",pasos:[
+    "Iniciar la ventilación de la sala de bombas.",
+    "Arrancar el sistema hidráulico (3 min de calentamiento).",
+    "Arrancar el motor de la bomba de dragado (la bomba no girará aún — está fijada por caja de engranajes con embrague).",
+    "Abrir la válvula de succión de la bomba de dragado de la tubería de dragado.",
+    "Abrir la válvula de presión general de la bodega y las válvulas de presión de la bodega en que se desea cargar.",
+    "Poner en marcha la bomba del glandula.",
+    "Poner en marcha la bomba de agua de lavado para las válvulas de la draga.",
+    "Verificar en pantalla de válvula que la presión del glandula es ≈ 4 bar.",
+  ]},
+  {id:"p03",cat:"Operación",titulo:"3. Dragado — Procedimiento Completo",pasos:[
+    "NAVEGANTE — Confirmar que el equipo de dragado fue iniciado según el manual de dragado disponible a bordo.",
+    "NAVEGANTE — Mantener velocidad entre 1 y 2 nudos durante el dragado de arrastre (velocidad sobre el fondo).",
+    "NAVEGANTE — ⚠ NUNCA permitir que el buque vaya hacia atrás mientras el tubo de dragado está en el fondo. Causa daño severo al tubo y al marco de servicio.",
+    "NAVEGANTE — Dragar en el área indicada por la oficina, cliente o instructores Sunergon.",
+    "NAVEGANTE — Confirmar que el nivel de agua correcto fue ingresado en el software Viking diariamente.",
+    "NAVEGANTE — Comunicar claramente al operador cuándo debe iniciar el dragado (bajar el tubo) y cuándo debe levantarlo.",
+    "NAVEGANTE — Si hay espera de tráfico por más de 30 min: detener motores de propulsión principal, bow thruster y bombas.",
+    "NAVEGANTE — Comunicar las maniobras que se van a realizar para que el operador pueda anticipar qué pasará con el tubo.",
+    "NAVEGANTE — Con el tubo de dragado en el agua, la velocidad máxima permitida es 6 nudos por el agua (≈4.5 nudos contra la corriente).",
+    "NAVEGANTE — Al descargar por puertas de fondo: verificar que hay al menos 2.5 m de agua bajo el buque.",
+    "NAVEGANTE — No permitir abrir las puertas de fondo con velocidad mayor a 2 nudos.",
+    "NAVEGANTE — ⚠ Solo bajar el spudpole si el buque no está en movimiento. No es un freno — usarlo así causa daño severo.",
+    "OPERADOR — Iniciar el equipo de dragado según el manual disponible a bordo.",
+    "OPERADOR — Solo bajar el tubo cuando la velocidad del buque sea menor a 2.5 nudos.",
+    "OPERADOR — Siempre controlar la posición del tubo por el cable del cabezal. ⚠ Nunca permitir que el cabezal vaya debajo del buque.",
+    "OPERADOR — Levantar el tubo y comunicar al navegante si la velocidad del buque cae debajo de 0.6 nudos o supera 2.6 nudos.",
+    "OPERADOR — El sello entre el casco y el tubo de chorro en el tubo de succión es sensible: aumentar y disminuir la velocidad del motor de la bomba de chorro SIEMPRE de forma lenta.",
+    "OPERADOR — Antes de izar el tubo: cerrar la válvula de agua de chorro al tubo y abrir otra válvula del sistema.",
+    "OPERADOR — Antes de embragar la bomba de dragado: confirmar que la bomba del glandula está funcionando con presión suficiente.",
+    "OPERADOR — El filtro de aspiración de la bomba del glandula debe limpiarse si la presión baja de 2.5 bar.",
+    "OPERADOR — ⚠ No dejar que la presión de aspiración de la bomba de dragado baje de -0.75 bar.",
+    "OPERADOR — En proyectos largos: rotar los operadores para que no siempre trabajen con el mismo navegante.",
+    "OPERADOR — Al inicio de cada turno: inspección completa del tubo de dragado (cabezal, cables, winches, elementos flexibles, sensores, cables, daños, fisuras, pernos sueltos, sellos).",
+    "INICIO DE PROYECTO — Realizar reunión de kick-off (presencial o digital). Anotar y firmar los objetivos del proyecto y otra información importante.",
+    "Levantar el tubo de dragado y sacarlo de su soporte.",
+    "Presionar los tres pórticos hacia el exterior (a veces detener el más adelantado porque es más rápido).",
+    "Bajar el tubo de dragado siempre en forma pareja. Detener cuando el cable de proa se afloje. ⚠ Asegurar que el tubo no se extiende por debajo del buque.",
+    "Verificar que el cabezal de draga está completamente bajo el agua.",
+    "Verificar temperatura del aceite del motor de la bomba de dragado ≥ 50°C.",
+    "Consultar con el patrón y embragar la bomba de dragado.",
+    "Abrir válvula de agua de chorro a la cabeza de draga y cerrar las válvulas a los cañones.",
+    "Si temperatura del aceite del motor de la bomba de chorro > 50°C: aumentar RPM lentamente hasta 1900 rpm.",
+    "La presión del chorro debe ser ≥ 6 bar.",
+    "Aumentar RPM bomba de dragado a 1100 rpm.",
+    "Poner registro en línea en Viking (clic casilla inferior izquierda o F5). Verificar esfera verde.",
+    "Señalar al patrón que el tubo está listo.",
+    "SOLO cuando el capitán da la señal: bajar el cabezal de succión al fondo.",
+    "En aguas poco profundas (hasta 6 m): usar solo el cabrestante del cabezal de draga.",
+    "Bajar el cabezal hasta que el cable quede ligeramente flojo y mantenerlo así. ⚠ Si el cable está tenso, el cabezal no está en el fondo.",
+    "⚠ Mantener el cable dentro de la zona verde. Fuera de ella es peligroso (el cabezal podría pasar bajo el buque).",
+  ]},
+  {id:"p04",cat:"Operación",titulo:"4. Stop Dragado",pasos:[
+    "Cuando el patrón determina que no hay más carga o que el dragado debe detenerse: levantar el cabezal de succión del fondo hasta que cuelgue horizontalmente junto al buque.",
+    "Esperar hasta que solo salga agua limpia de los conductos de carga.",
+    "Reducir la velocidad de la bomba de chorro y de la bomba de dragado al mínimo.",
+    "Desconectar el registro en Viking (clic casilla inferior izquierda o F5).",
+    "Desembragar la bomba de dragado.",
+    "Abrir 1 cañón de chorro y cerrar la válvula de la tubería de dragado. Dejar la válvula del cañón abierta (siempre debe haber una válvula de presión abierta al arrancar la bomba).",
+    "Levantar el tubo de la draga horizontalmente. ⚠ Detenerse antes de que se atasque en la parte superior — si ocurriera, el cable podría romperse.",
+    "Subir el cabrestante de proa hasta el tope (si no, el tubo no puede introducirse al interior).",
+    "Cuando el tubo está arriba: empujar los pórticos hacia adentro.",
+    "Bajar el tubo de dragado a sus soportes con los 2 cabrestantes de popa.",
+    "Detener la bomba del glandula y la bomba de agua de lavado.",
+    "Detener la bomba de chorro y cerrar la válvula de aspiración INMEDIATAMENTE después. ⚠ Si se olvida, la bomba no extraerá agua la próxima vez que se ponga en marcha.",
+    "Detener el motor de la bomba de dragado.",
+    "Detener el sistema hidráulico.",
+    "Detener la ventilación de la cámara de bombeo.",
+    "Opción A: Si el lugar de descarga está cerca — dejar todo como está y continuar con el procedimiento de Descarga.",
+    "Opción B: Si no hay más dragado o faltan ≥ 15 min hasta el lugar de descarga — continuar con el paso 12 del procedimiento de Stop.",
+  ]},
+  {id:"p05",cat:"Operación",titulo:"5. Descarga con Puertas",pasos:[
+    "Si acaba de dragar y dejó el sistema como en el paso 12 del dragado, continuar desde aquí. Si no, poner en marcha la ensacadora y la bomba de surtidores.",
+    "Poner en marcha la bomba del glandula.",
+    "Poner en marcha la bomba de agua de lavado para las válvulas de la draga.",
+    "Verificar en pantalla de válvula de draga que la presión del glandula es ≈ 4 bar.",
+    "Abrir las 8 secciones de chorro (boquillas en la bodega) y cerrar los cañones para licuar el material del fondo. Hacer esto ≥ 2 min antes de llegar al lugar de descarga.",
+    "Aumentar la presión del motor. ⚠ Presión máxima del sistema: 8 bar.",
+    "Cuando el buque llega al lugar de descarga y el capitán da la señal: abrir las puertas del fondo. ⚠ Las puertas abiertas sobresalen 1 m debajo del buque — necesitar ≥ 1.5 m de agua bajo el buque.",
+    "Si hay carga en ambas bodegas: abrir las puertas de ambas al mismo tiempo. Cuando estén completamente bajas, dejar de presionar.",
+    "Verificar que la válvula de succión de la bomba de dragado está abierta y las válvulas de descarga a la bodega.",
+    "Embragar la bomba de dragado y subir a 1250 rpm. Abrir solo 1 bodega para dar más potencia a esa bodega en particular.",
+    "Desde la bodega cerrada: abrir el cañón de chorros. Cerrar las toberas en la otra bodega para más presión en el cañón.",
+    "Para accionar el cañón: pulsar el botón del arma derecha. Usar el cañón para rociar la bodega limpia.",
+    "Cuando la primera bodega esté limpia: hacer la otra.",
+    "Cuando ambas estén limpias: reducir velocidad de ambos motores al mínimo.",
+    "Dejar solo 1 cañón de chorro abierto en el sistema.",
+    "Desembragar la bomba de dragado.",
+    "Detener la bomba del glandula y la bomba de agua de lavado.",
+    "Opción A: Si el lugar de dragado está cerca — dejar todo como está y continuar con procedimiento de Dragado.",
+    "Opción B: Si no hay más dragado o faltan ≥ 15 min — continuar con el punto 12 del procedimiento de Stop Dragado.",
+  ]},
+  {id:"p06",cat:"Técnico",titulo:"6. Cambio de Generador y PCs",pasos:[
+    "⚠ El cambio de generador SIEMPRE debe consultarse con el personal del puente (es necesario apagar programas y computadoras).",
+    "Verificar siempre primero el nivel de aceite y agua de refrigeración del generador. Incluso después de arrancarlo, ir a comprobar que no pasa nada.",
+    "Encender el generador deseado en la red y dejar que se caliente durante 5 minutos.",
+    "Cerrar primero los programas (ver detalle abajo). Después apagar las computadoras. Solo entonces cambiar de generador.",
+    "Apagar también el aire acondicionado de la caja de dirección (de lo contrario se disparará).",
+    "Apagar también el PC de la cámara.",
+    "CAMBIO (ej. babor → estribor): 1) Desconectar disyuntor generador babor (voltímetros a cero). 2) Mover interruptor selector al generador estribor. 3) Empujar interruptor del generador estribor. 4) Reajustar disyuntor intermedio en cámara de máquina (girar derecha, luego izquierda).",
+    "APAGADO DE SOFTWARE — Viking: cerrar el programa desde el menú File → Close Program → Shutdown Windows. Apagar la PC.",
+    "APAGADO DE SOFTWARE — Sistema de profundidad: doble clic en símbolo 'cumarina' → clic en 'stop meten' → cerrar ambas ventanas → apagar PC.",
+    "REINICIO — Iniciar software Viking pulsando el símbolo 'Viking'. Iniciar los 2 programas de profundidad (ComAlpha-Snelkoppeling y Diepgang-Snelkoppeling).",
+    "Verificar que aparece el ícono azul de 'ComAlpha' en la barra inferior — indica que el programa de comunicación está funcionando con el software de la draga.",
+  ]},
+  {id:"p07",cat:"Técnico",titulo:"7. Puntos de Control Pre/Post Dragado",pasos:[
+    "PRE-DRAGADO — Verificar con sala de máquinas que todos los motores están revisados y listos para funcionar.",
+    "PRE — Iniciar Teamviewer y compartir el código con Edwin y Justus.",
+    "PRE — Verificar si el nivel de agua del río fue actualizado (normalmente disponible desde las 09:00 en la web de Meteorología PY). Ver documento 'Actualizar nivel del río' para cómo ingresarlo en Viking.",
+    "PRE — Verificar que las válvulas de aspiración de la bomba de chorro (después del filtro), la bomba del glandula y la bomba de agua de aclarado para las válvulas de la draga están abiertas.",
+    "POST-DRAGADO — Limpiar e inspeccionar el cabezal de la draga.",
+    "POST — Verificar que el cable sigue tenso en el cabrestante.",
+    "POST — Revisar el pozo de la bomba de dragado y vaciarlo si es necesario con la bomba de achique.",
+    "POST — Verificar que todas las bombas y motores están realmente parados.",
+    "POST — Anotar las posiciones del módulo de cálculo de m3 a dragar.",
+  ]},
+  {id:"p08",cat:"Técnico",titulo:"8. Sondeo de Bodegas",pasos:[
+    "Para llevar cuenta del material transportado, calibrar la bodega en cada viaje.",
+    "En cada bodega hay 4 puntos marcados con un número que corresponde a la columna del archivo Excel.",
+    "Se mide el Ullage: la distancia desde la parte superior de la bodega hasta el material.",
+    "Rellenar en el archivo Excel solo la fecha, el número de viaje y las casillas amarillas con los valores leídos.",
+    "⚠ Los valores deben redondearse a centímetros terminados en cero (ej: 381 cm → ingresar como 380 cm).",
+    "Con los 8 valores ingresados, el sistema calcula automáticamente los m3 de material en las bodegas.",
+    "Si solo hay una bodega cargada: ingresar el valor 450 cm en los 4 puntos de la bodega vacía (corresponde a bodega vacía).",
+  ]},
+  {id:"p09",cat:"Navegación",titulo:"9. Procedimientos bajo Navegación",pasos:[
+    "Antes de zarpar, verificar:",
+    "— Confirmar que las puertas de fondo están CERRADAS.",
+    "— Confirmar que Taruma II y III están correctamente amarradas junto al Taruma.",
+    "— El permiso de navegación ha sido otorgado por Prefectura.",
+    "Navegando con Taruma II y III a los costados: velocidad máxima 8 nudos por el agua (≈6 nudos contra la corriente, ≈10 nudos a favor de la corriente).",
+    "Sin urgencia extrema: mantener consumo económico de 100 L/hr durante la navegación.",
+  ]},
+  {id:"p10",cat:"Navegación",titulo:"10. Entrega de Guardia (Handover)",pasos:[
+    "La entrega de guardia aplica para cada cambio de turno tanto para navegantes como para operadores.",
+    "La siguiente información DEBE ser entregada:",
+    "— Posición y estado actual de dragado (cargando / descargando / en tránsito).",
+    "— Condición del equipo.",
+    "— Alarmas activas, defectos o mantenimiento en curso.",
+    "— Detalles de navegación (tráfico, restricciones, etc.).",
+    "— Temas de seguridad, permisos o trabajos en curso.",
+    "— Novedades durante el último turno.",
+    "⚠ Las maniobras (virajes, marcha atrás, etc.) deben ser FINALIZADAS por el turno saliente. NO entregar el timón en medio de una maniobra.",
+    "El nuevo turno debe verificar:",
+    "— Controles operativos y lecturas de instrumentos.",
+    "— Sistemas de comunicación (VHF).",
+    "— Parámetros de motor y bomba.",
+    "— Funcionamiento de luces de navegación (de noche).",
+  ]},
+  {id:"p11",cat:"Navegación",titulo:"11. Horas de Trabajo por Tipo de Operación",pasos:[
+    "DRAGADO — Capitán / A.B.1 / Jefe de Máquinas: 06:00–12:00 y 18:00–24:00.",
+    "DRAGADO — Baqueano / A.B.2 / Engrasador: 00:00–06:00 y 12:00–18:00.",
+    "DRAGADO — A.B.3 y A.B.4 (si a bordo): 06:00–12:00 y 18:00–24:00 o 00:00–06:00 y 12:00–18:00.",
+    "NAVEGACIÓN — Capitán / A.B.1 / J.M.: 06:00–12:00 y 18:00–24:00.",
+    "NAVEGACIÓN — Baqueano / A.B.2 / Engrasador: 00:00–06:00 y 12:00–18:00.",
+    "NAVEGACIÓN — A.B.3 y A.B.4 (si a bordo): 07:00–11:30 y 13:00–18:00.",
+    "TIEMPO INACTIVO — Todo el personal: 07:30–11:30 y 13:00–17:00 (puede extenderse si el trabajo lo requiere).",
+    "Reunión diaria en tiempo inactivo: 07:00 para seguridad y coordinación de tareas.",
+    "Reunión semanal: lunes a las 07:00. Presencia mínima requerida: Capitán, Jefe de Máquinas y al menos 1 instructor Sunergon.",
+  ]},
+  {id:"p12",cat:"Operaciones Generales",titulo:"12. Procedimientos Tiempo Inactivo",pasos:[
+    "Realizar tareas de mantenimiento para mantener la condición del buque, incluyendo entre otras:",
+    "— Limpieza de la cubierta.",
+    "— Limpieza de la superestructura.",
+    "— Conservar el casco donde la pintura esté dañada para evitar corrosión.",
+    "— Limpieza de maquinaria (salas de motor principal, sala de bombas, sala de bow thruster y áreas de almacenamiento).",
+    "Realizar mantenimiento de motores, bombas y otros equipos normalmente en operación.",
+    "Engrasado de equipos.",
+    "Housekeeping general.",
+    "Semanal: probar todo el equipo de dragado según el 'Procedimiento de Prueba'.",
+    "Semanal: arrancar motores de Taruma II y III durante 20 min con motores en marcha para verificar medidores físicos y sistemas de refrigeración y lubricación.",
+    "Al terminar la jornada, asegurar que el buque está cerrado:",
+    "— Sala de generadores.",
+    "— Depósito de pintura.",
+    "— Sala de bombas.",
+    "— Salas de máquinas.",
+    "— Timonera.",
+    "— Salidas de emergencia: solo se cierran desde adentro.",
+  ]},
+  {id:"p13",cat:"Operaciones Generales",titulo:"13. Funciones y Responsabilidades por Cargo",pasos:[
+    "CAPITÁN — Reporta a: Persona designada en la oficina. Sustituto: Baqueano.",
+    "CAPITÁN — Mando general del buque. Garantizar cumplimiento de leyes y regulaciones nacionales e internacionales.",
+    "CAPITÁN — Planificación y ejecución de navegación y dragado. Guardia y navegación. Radio y vigilancia general.",
+    "CAPITÁN — Instruir a la tripulación y supervisar la ejecución. Planificación de guardias.",
+    "CAPITÁN — Economía del buque. Motivación de la tripulación. Mantenimiento de comunicación entre buque y empresa.",
+    "CAPITÁN — Elaborar plan de dragado en consulta con la oficina e instructores. Inspección semanal de housekeeping.",
+    "CAPITÁN — Reportes: Informe diario de dragado. Hoja de mantenimiento semanal y logbook de máquinas. Inventario mensual. Acta de reunión semanal. Reportar cualquier daño o equipo fuera de servicio.",
+    "BAQUEANO — Reporta a: Capitán. Guardia y navegación. Radio. Asiste y reemplaza al capitán cuando sea necesario.",
+    "BAQUEANO — Seguir el plan de dragado preparado por el capitán. Posicionar el buque correctamente en zonas de dragado y descarga.",
+    "A/B (MARINERO) — Reporta a: Capitán. Mantenimiento, engrasado y trabajos de conservación.",
+    "A/B — Acciones en estaciones de maniobra según instrucciones. Mantenimiento del equipo de cubierta.",
+    "A/B — Operar el equipo de dragado según los procedimientos. Seguir el plan de dragado. Inspecciones rutinarias del equipo de dragado.",
+    "JEFE DE MÁQUINAS — Reporta a: Capitán. Sustituto: Engrasador. Liderar el departamento técnico.",
+    "JEFE DE MÁQUINAS — Planificar, controlar y registrar todo mantenimiento y reparaciones en documentos propios.",
+    "JEFE DE MÁQUINAS — Monitorear sistemas de control de máquinas. Mantener logbook de máquinas y documentación necesaria.",
+    "JEFE DE MÁQUINAS — Planificar y ejecutar suministro de combustibles y consumibles en coordinación con el Capitán.",
+    "JEFE DE MÁQUINAS — Responsable de materiales peligrosos. Verificar que la lista de intervalos de engrasado está actualizada.",
+    "JEFE DE MÁQUINAS — Reportes: Consumo diario de combustible. Logbook de sala de máquinas semanal. Plan de mantenimiento semanal. Inventario mensual de sala de máquinas.",
+    "ENGRASADOR — Reporta a: Jefe de Máquinas. Ejecutar mantenimiento y reparaciones.",
+    "ENGRASADOR — Guardia de máquinas. Mantener depósitos de combustible, aceite, grasa y agua potable al nivel deseado.",
+    "ENGRASADOR — Limpieza. Engrasado. Monitorear datos de motores (temperaturas) según instrucciones.",
+    "ENGRASADOR — Asistir en operaciones de abastecimiento. Anotar fechas de engrasado en la lista de intervalos.",
+  ]},
+];
+
+function Procedimientos({user}){
+  const[busqueda,setBusqueda]=useState("");
+  const[catActiva,setCatActiva]=useState("Todos");
+  const[abierto,setAbierto]=useState(null);
+
+  const cats=["Todos",...new Set(PROCS.map(p=>p.cat))];
+  const visibles=user.role==="gerente"?PROCS:PROCS.filter(p=>p.roles.includes(user.role));
+  const filtrados=visibles.filter(p=>{
+    const catOk=catActiva==="Todos"||p.cat===catActiva;
+    const busOk=!busqueda||p.titulo.toLowerCase().includes(busqueda.toLowerCase())||p.pasos.some(s=>s.toLowerCase().includes(busqueda.toLowerCase()));
+    return catOk&&busOk;
+  });
+
+  const catColors={"Operación":"#313280","Técnico":"#6d28d9","Navegación":"#0369a1","Operaciones Generales":"#16a34a"};
+
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Procedimientos</div></div>
+    <div className="ps">Biblioteca de procedimientos operativos — Draga Taruma</div>
+
+    <div style={{display:"flex",gap:9,marginBottom:18,flexWrap:"wrap",alignItems:"center"}}>
+      <input style={{flex:1,minWidth:200,padding:"9px 13px"}} value={busqueda} onChange={e=>setBusqueda(e.target.value)} placeholder="Buscar procedimiento o palabra clave..."/>
+      <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        {cats.map(c=><button key={c} className="btn" style={{padding:"8px 14px",fontSize:12,background:catActiva===c?(catColors[c]||"#313280"):"#fff",color:catActiva===c?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:8}} onClick={()=>setCatActiva(c)}>{c}</button>)}
+      </div>
+    </div>
+
+    <div style={{fontSize:12,color:"#8a8aaa",marginBottom:14}}>{filtrados.length} procedimiento{filtrados.length!==1?"s":""} disponibles</div>
+
+    {filtrados.map(p=>{
+      const isOpen=abierto===p.id;
+      const col=catColors[p.cat]||"#313280";
+      return <div key={p.id} className="card" style={{cursor:"pointer",borderLeft:"4px solid "+col}} onClick={()=>setAbierto(isOpen?null:p.id)}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:isOpen?6:0,flexWrap:"wrap"}}>
+              <span className="badge" style={{background:col+"18",color:col,border:"1px solid "+col+"35",fontSize:10}}>{p.cat}</span>
+              <span style={{fontSize:14,fontWeight:700,color:"#1a1a2e"}}>{p.titulo}</span>
+            </div>
+            {!isOpen&&<div style={{fontSize:12,color:"#8a8aaa",marginTop:3}}>{p.pasos.length} pasos — click para ver</div>}
+          </div>
+          <div style={{color:"#8a8aaa",fontSize:18,marginLeft:12,flexShrink:0}}>{isOpen?"▲":"▼"}</div>
+        </div>
+        {isOpen&&<div style={{marginTop:14}}>
+          <div className="divider"/>
+          <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:0}}>
+            {p.pasos.map((paso,i)=>{
+              const isWarn=paso.startsWith("⚠");
+              const isSection=paso.includes("—")&&paso.split("—")[0].length<25&&paso.split("—")[0].toUpperCase()===paso.split("—")[0];
+              return <div key={i} style={{display:"flex",gap:12,padding:"9px 0",borderBottom:"1px solid rgba(226,228,234,.4)",background:isWarn?"rgba(217,119,6,.04)":"transparent",margin:"0 -4px",padding:"9px 4px"}}>
+                <div style={{minWidth:24,height:24,borderRadius:"50%",background:isWarn?"#d97706":col,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0,marginTop:1}}>{isWarn?"!":i+1}</div>
+                <div style={{fontSize:13,color:isWarn?"#d97706":"#1a1a2e",fontWeight:isWarn||isSection?600:400,lineHeight:1.6}}>{paso}</div>
+              </div>;
+            })}
+          </div>
+        </div>}
+      </div>;
+    })}
+    {!filtrados.length&&<div style={{textAlign:"center",color:"#8a8aaa",padding:40}}>Sin procedimientos que coincidan con la búsqueda</div>}
+  </div>;
+}
+
+
+// ── Tablas calibración bodegas (Taruma) ──────────────────────────────────────────
+const HOPPER_AFT=[691.056, 689.52, 687.984, 686.448, 684.912, 683.376, 681.84, 680.304, 678.768, 677.232, 675.696, 674.16, 672.624, 671.088, 669.552, 668.016, 666.48, 664.944, 663.408, 661.872, 660.336, 658.8, 657.264, 655.728, 654.192, 652.656, 651.12, 649.584, 648.048, 646.512, 644.976, 643.44, 641.904, 640.368, 638.832, 637.296, 635.76, 634.224, 632.688, 631.152, 629.616, 628.08, 626.544, 625.008, 623.472, 621.936, 620.4, 618.864, 617.328, 615.792, 614.256, 612.72, 611.184, 609.648, 608.112, 606.576, 605.04, 603.504, 601.968, 600.432, 598.896, 597.36, 595.824, 594.288, 592.752, 591.216, 589.68, 588.144, 586.608, 585.072, 583.536, 582.0, 580.464, 578.928, 577.392, 575.856, 574.32, 572.784, 571.248, 569.712, 568.176, 566.64, 565.104, 563.568, 562.032, 560.496, 558.96, 557.424, 555.888, 554.352, 552.816, 551.28, 549.744, 548.208, 546.672, 545.136, 543.6, 542.064, 540.528, 538.992, 537.456, 535.92, 534.384, 532.848, 531.312, 529.776, 528.24, 526.704, 525.168, 523.632, 522.096, 520.56, 519.024, 517.488, 515.952, 514.416, 512.88, 511.344, 509.808, 508.272, 506.736, 505.2, 503.664, 502.128, 500.592, 499.056, 497.52, 495.984, 494.448, 492.912, 491.376, 489.84, 488.304, 486.768, 485.232, 483.696, 482.16, 480.624, 479.088, 477.552, 476.016, 474.48, 472.944, 471.408, 469.872, 468.336, 466.8, 465.264, 463.728, 462.192, 460.656, 459.12, 457.584, 456.048, 454.512, 452.976, 451.44, 449.904, 448.368, 446.832, 445.296, 443.76, 442.224, 440.688, 439.152, 437.616, 436.08, 434.544, 433.008, 431.472, 429.936, 428.4, 426.864, 425.328, 423.792, 422.256, 420.72, 419.184, 417.648, 416.112, 414.576, 413.04, 411.504, 409.968, 408.432, 406.896, 405.36, 403.824, 402.288, 400.752, 399.216, 397.68, 396.144, 394.608, 393.072, 391.536, 390.0, 388.464, 386.928, 385.392, 383.856, 382.32, 380.784, 379.248, 377.712, 376.176, 374.64, 373.104, 371.568, 370.032, 368.496, 366.96, 365.424, 363.888, 362.352, 360.816, 359.28, 357.744, 356.208, 354.672, 353.136, 351.6, 350.064, 348.528, 346.992, 345.456, 343.92, 342.384, 340.848, 339.312, 337.776, 336.24, 334.704, 333.168, 331.632, 330.096, 328.56, 327.024, 325.488, 323.952, 322.416, 320.88, 319.344, 317.808, 316.272, 314.736, 313.2, 311.664, 310.128, 308.592, 307.056, 305.52, 303.984, 302.448, 300.912, 299.376, 297.84, 296.304, 294.768, 293.232, 291.696, 290.16, 288.624, 287.088, 285.552, 284.016, 282.48, 280.944, 279.408, 277.872, 276.336, 274.8, 273.264, 271.728, 270.192, 268.656, 267.12, 265.584, 264.048, 262.512, 260.976, 259.44, 257.904, 256.368, 254.832, 253.296, 251.76, 250.224, 248.688, 247.152, 245.616, 244.08, 242.544, 241.008, 239.472, 237.936, 236.4, 234.864, 233.328, 231.792, 230.256, 228.72, 227.184, 225.648, 224.112, 222.576, 221.04, 219.504, 217.968, 216.432, 214.896, 213.36, 211.824, 210.288, 208.752, 207.216, 205.68, 204.144, 202.608, 201.072, 199.536, 198.0, 196.464, 194.928, 193.392, 191.856, 190.32, 188.784, 187.248, 185.712, 184.176, 182.64, 181.104, 179.568, 178.032, 176.496, 174.96, 173.424, 171.888, 170.352, 168.816, 167.28, 165.744, 164.208, 162.672, 161.136, 159.6, 158.064, 156.528, 154.992, 153.456, 151.92, 150.384, 148.848, 147.312, 145.776, 144.24, 142.704, 141.168, 139.632, 138.096, 136.56, 135.024, 133.488, 131.952, 130.416, 128.88, 127.344, 125.808, 124.272, 122.736, 121.2, 119.664, 118.128, 116.592, 115.056, 113.52, 111.984, 110.448, 108.912, 107.376, 105.84, 104.304, 102.768, 101.232, 99.696, 98.16, 96.624, 95.088, 93.552, 92.016, 90.48, 88.944, 87.408, 85.872, 84.336, 82.8, 81.264, 79.728, 78.192, 76.656, 75.12, 73.584, 72.048, 70.512, 68.976, 67.44, 65.904, 64.368, 62.832, 61.296, 59.76, 58.224, 56.688, 55.152, 53.616, 52.08, 50.544, 49.008, 47.472, 45.936, 44.4, 42.864, 41.328, 39.792, 38.256, 36.72, 35.184, 33.648, 32.112, 30.576, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 15.288, 16.816, 18.344, 19.872, 21.4, 22.928, 24.456, 25.984, 27.512, 29.04, 0.0];
+const HOPPER_FORE=[696.0, 694.453, 692.907, 691.36, 689.813, 688.267, 686.72, 685.173, 683.627, 682.08, 680.533, 678.987, 677.44, 675.893, 674.347, 672.8, 671.253, 669.707, 668.16, 666.613, 665.067, 663.52, 661.973, 660.427, 658.88, 657.333, 655.787, 654.24, 652.693, 651.147, 649.6, 648.053, 646.507, 644.96, 643.413, 641.867, 640.32, 638.773, 637.227, 635.68, 634.133, 632.587, 631.04, 629.493, 627.947, 626.4, 624.853, 623.307, 621.76, 620.213, 618.667, 617.12, 615.573, 614.027, 612.48, 610.933, 609.387, 607.84, 606.293, 604.747, 603.2, 601.653, 600.107, 598.56, 597.013, 595.467, 593.92, 592.373, 590.827, 589.28, 587.733, 586.187, 584.64, 583.093, 581.547, 580.0, 578.453, 576.907, 575.36, 573.813, 572.267, 570.72, 569.173, 567.627, 566.08, 564.533, 562.987, 561.44, 559.893, 558.347, 556.8, 555.253, 553.707, 552.16, 550.613, 549.067, 547.52, 545.973, 544.427, 542.88, 541.333, 540.567, 539.0, 537.433, 535.867, 534.3, 532.733, 531.167, 529.6, 528.033, 526.467, 524.9, 523.333, 521.767, 520.2, 518.633, 517.067, 515.5, 513.933, 512.367, 510.8, 509.233, 507.667, 506.1, 504.533, 502.967, 501.4, 499.833, 498.267, 496.7, 495.133, 493.567, 492.0, 490.433, 488.867, 487.3, 485.733, 484.167, 482.6, 481.033, 479.467, 477.92, 476.373, 474.827, 473.28, 471.733, 470.187, 468.64, 467.093, 465.547, 464.0, 462.453, 460.907, 459.36, 457.813, 456.267, 454.72, 453.173, 451.627, 450.08, 448.533, 446.987, 445.44, 443.893, 442.347, 440.8, 439.253, 437.707, 436.16, 434.613, 433.067, 431.52, 429.973, 428.427, 426.88, 425.333, 423.787, 422.24, 420.693, 419.147, 417.6, 416.053, 414.507, 412.96, 411.413, 409.867, 408.32, 406.773, 405.227, 403.68, 402.133, 400.587, 399.04, 397.493, 395.947, 394.4, 392.853, 391.307, 389.76, 388.213, 386.667, 385.12, 383.573, 382.027, 380.48, 378.933, 377.387, 375.84, 374.293, 372.747, 371.2, 369.653, 368.107, 366.56, 365.013, 363.467, 361.92, 360.373, 358.827, 357.28, 355.733, 354.187, 352.64, 351.093, 349.547, 348.0, 346.453, 344.907, 343.36, 341.813, 340.267, 338.72, 337.173, 335.627, 334.08, 332.533, 330.987, 329.44, 327.893, 326.347, 324.8, 323.253, 321.707, 320.16, 318.613, 317.067, 315.52, 313.973, 312.427, 310.88, 309.333, 307.787, 306.24, 304.693, 303.147, 301.6, 300.053, 298.507, 296.96, 295.413, 293.867, 292.32, 290.773, 289.227, 287.68, 286.133, 284.587, 283.04, 281.493, 279.947, 278.4, 276.853, 275.307, 273.76, 272.213, 270.667, 269.12, 267.573, 266.027, 264.48, 262.933, 261.387, 259.84, 258.293, 256.747, 255.2, 253.653, 252.107, 250.56, 249.013, 247.467, 245.92, 244.373, 242.827, 241.28, 239.733, 238.187, 236.64, 235.093, 233.547, 232.0, 230.453, 228.907, 227.36, 225.813, 224.267, 222.72, 221.173, 219.627, 218.08, 216.533, 214.987, 213.44, 211.893, 210.347, 208.8, 207.253, 205.707, 204.16, 202.613, 201.067, 199.52, 197.973, 196.427, 194.88, 193.333, 191.787, 190.24, 188.693, 187.147, 185.6, 184.053, 182.507, 180.96, 179.413, 177.867, 176.32, 174.773, 173.227, 171.68, 170.133, 168.587, 167.04, 165.493, 163.947, 162.4, 160.853, 159.307, 157.76, 156.213, 154.667, 153.12, 151.573, 150.027, 148.48, 146.933, 145.387, 143.84, 142.293, 140.747, 139.2, 137.653, 136.107, 134.56, 133.013, 131.467, 129.92, 128.373, 126.827, 125.28, 123.733, 122.187, 120.64, 119.093, 117.547, 116.0, 114.453, 112.907, 111.36, 109.813, 108.267, 106.72, 105.173, 103.627, 102.08, 100.533, 98.987, 97.44, 95.893, 94.347, 92.8, 91.253, 89.707, 88.16, 86.613, 85.067, 83.52, 81.973, 80.427, 78.88, 77.333, 75.787, 74.24, 72.693, 71.147, 69.6, 68.053, 66.507, 64.96, 63.413, 61.867, 60.32, 58.773, 57.227, 55.68, 54.133, 52.586, 51.04, 49.493, 47.946, 46.4, 44.853, 43.307, 41.76, 40.213, 38.666, 37.12, 35.573, 34.026, 32.48, 30.933, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 15.467, 17.013, 18.56, 20.106, 21.653, 23.2, 24.747, 26.293, 27.84, 29.387, 0.0];
+
+// Lookup con interpolación lineal si el valor exacto no está
+function hopperLookup(table, ullage){
+  const u=Math.max(0,Math.min(450,Math.round(ullage)));
+  if(table[u]!==undefined&&table[u]!==null)return table[u];
+  // interpolate
+  let lo=u,hi=u;
+  while(lo>=0&&(table[lo]===undefined||table[lo]===null))lo--;
+  while(hi<=450&&(table[hi]===undefined||table[hi]===null))hi++;
+  if(lo<0)return table[hi]||0;
+  if(hi>450)return table[lo]||0;
+  const t=(u-lo)/(hi-lo);
+  return table[lo]+(table[hi]-table[lo])*t;
+}
+
+// Cálculo M³ por sondeo de bodega
+// aftUllages: [pt11, pt9, pt7, pt12, pt10, pt8]
+// foreUllages: [pt5, pt3, pt1, pt6, pt4, pt2]
+function calcM3Bodega(aftUllages, foreUllages){
+  const aft=[
+    hopperLookup(HOPPER_AFT, aftUllages[0]-10), // pt11 (extremo popa PS)
+    hopperLookup(HOPPER_AFT, aftUllages[1]),      // pt9
+    hopperLookup(HOPPER_AFT, aftUllages[2]),      // pt7
+    hopperLookup(HOPPER_AFT, aftUllages[3]-10), // pt12 (extremo popa SB)
+    hopperLookup(HOPPER_AFT, aftUllages[4]),      // pt10
+    hopperLookup(HOPPER_AFT, aftUllages[5]),      // pt8
+  ];
+  const fore=[
+    hopperLookup(HOPPER_FORE, foreUllages[0]),      // pt5
+    hopperLookup(HOPPER_FORE, foreUllages[1]),      // pt3
+    hopperLookup(HOPPER_FORE, foreUllages[2]-10), // pt1 (extremo proa PS)
+    hopperLookup(HOPPER_FORE, foreUllages[3]),      // pt6
+    hopperLookup(HOPPER_FORE, foreUllages[4]),      // pt4
+    hopperLookup(HOPPER_FORE, foreUllages[5]-10), // pt2 (extremo proa SB)
+  ];
+  const h2=aft.reduce((s,v)=>s+v,0)/6;
+  const h1=fore.reduce((s,v)=>s+v,0)/6;
+  return{h1:Math.round(h1*100)/100,h2:Math.round(h2*100)/100,total:Math.round((h1+h2)*100)/100};
+}
+
+// Cálculo M³ por rainbow
+// duracion en horas (decimal)
+function calcM3Rainbow(horasDecimal){
+  return Math.round(horasDecimal*1000*0.14*100)/100;
+}
+
+// ── Tripulación ────────────────────────────────────────────────────────────────
+function Tripulacion({tripulantes,setTripulantes,embarques,setEmbarques,francosUsados,setFrancosUsados,user}){
+  const[vista,setVista]=useState("resumen");
+  const[saved,setSaved]=useState(false);const[saving,setSaving]=useState(false);const[errMsg,setErrMsg]=useState("");
+  const[showAddTrip,setShowAddTrip]=useState(false);
+  const[showEmb,setShowEmb]=useState(false);
+  const[showFranco,setShowFranco]=useState(false);
+  const[formTrip,setFormTrip]=useState({idNum:"",nombre:"",cargo:"MARINERO",libreta:"",ingreso:""});
+  const[formEmb,setFormEmb]=useState({idTrip:"",nombre:"",fEmb:"",fDes:"",tipo:"embarque"});
+  const[formFranco,setFormFranco]=useState({idTrip:"",nombre:"",fecha:"",dias:"",obs:"",tipo:"franco"});
+
+  const cargos=["CAPITAN","PATRON BAQUEANO","JEFE DE MAQUINAS","ENGRASADOR","MARINERO","COCINERO/A","CONTRAMAESTRE","OTRO"];
+
+  // Calculate summary per crew member
+  const resumen=tripulantes.map(t=>{
+    const embs=embarques.filter(e=>e.idTrip===t.idNum);
+    const totalDias=embs.reduce((s,e)=>s+e.dias,0);
+    const totalFrancosGen=embs.reduce((s,e)=>s+e.francos,0);
+    const totalFrancosUs=francosUsados.filter(f=>f.idTrip===t.idNum&&f.tipo!=="vacaciones").reduce((s,f)=>s+f.dias,0);
+    const totalVacaciones=francosUsados.filter(f=>f.idTrip===t.idNum&&f.tipo==="vacaciones").reduce((s,f)=>s+f.dias,0);
+    const saldo=totalFrancosGen-totalFrancosUs;
+    const embActual=embs.find(e=>!e.fDes||e.fDes==="");
+    const ultimoEmb=embs.sort((a,b)=>b.fEmb.localeCompare(a.fEmb))[0];
+    // Estimate fin de franco: if on land, last disembark + saldo days
+    let finFranco=null;
+    if(!t.embarcado&&ultimoEmb&&ultimoEmb.fDes&&saldo>0){
+      const d=new Date(ultimoEmb.fDes);d.setDate(d.getDate()+saldo);
+      finFranco=d.toISOString().slice(0,10);
+    }
+    const diasEnTierra=(!t.embarcado&&ultimoEmb&&ultimoEmb.fDes)?Math.round((new Date()-new Date(ultimoEmb.fDes))/(1000*60*60*24)):0;
+    return{...t,totalDias,totalFrancosGen,totalFrancosUs,saldo,totalVacaciones,embarcado:t.embarcado,ultimoEmb:ultimoEmb?ultimoEmb.fDes||ultimoEmb.fEmb:"",finFranco,diasEnTierra};
+  });
+
+  const embarcados=resumen.filter(t=>t.embarcado);
+  const enTierra=resumen.filter(t=>!t.embarcado);
+  const conSaldoNeg=resumen.filter(t=>t.saldo<0);
+  const totalNegativo=Math.abs(conSaldoNeg.reduce((s,t)=>s+t.saldo,0));
+  const totalSaldoPositivo=resumen.filter(t=>t.saldo>0).reduce((s,t)=>s+t.saldo,0);
+
+  const addTrip=async()=>{
+    if(!formTrip.nombre||!formTrip.idNum||saving)return;
+    setSaving(true);setErrMsg("");
+    const nuevo={idNum:Number(formTrip.idNum),nombre:formTrip.nombre.toUpperCase(),cargo:formTrip.cargo,libreta:Number(formTrip.libreta)||0,ingreso:formTrip.ingreso,embarcado:false};
+    try{const r=await atCreate("Tripulantes",mapTrip.to(nuevo));setTripulantes(prev=>[...prev,{...nuevo,_id:r.id,id:r.id}]);setFormTrip({idNum:"",nombre:"",cargo:"MARINERO",libreta:"",ingreso:""});setShowAddTrip(false);setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+
+  const registrarEmbarque=async()=>{
+    if(!formEmb.idTrip||!formEmb.fEmb||saving)return;
+    setSaving(true);setErrMsg("");
+    const trip=tripulantes.find(t=>t._id===formEmb.idTrip);
+    if(!trip){setErrMsg("Tripulante no encontrado");setSaving(false);return;}
+    if(formEmb.tipo==="embarque"){
+      // Update embarcado status
+      try{
+        await atUpdate("Tripulantes",trip._id,{Embarcado:true});
+        setTripulantes(prev=>prev.map(t=>t._id===trip._id?{...t,embarcado:true}:t));
+        // Create embarque record (no fDes yet)
+        const nuevo={idTrip:trip.idNum,nombre:trip.nombre,fEmb:formEmb.fEmb,fDes:"",dias:0,francos:0};
+        const r=await atCreate("Embarques",mapEmb.to(nuevo));
+        setEmbarques(prev=>[{...nuevo,_id:r.id,id:r.id},...prev]);
+        setSaved(true);setTimeout(()=>setSaved(false),3000);setFormEmb({idTrip:"",nombre:"",fEmb:"",fDes:"",tipo:"embarque"});setShowEmb(false);
+      }catch(e){setErrMsg(e.message);}
+    }else{
+      // Desembarque - find open embarque and update it
+      const embAbierto=embarques.find(e=>e.idTrip===trip.idNum&&(!e.fDes||e.fDes===""));
+      if(!embAbierto){setErrMsg("No hay embarque abierto para este tripulante");setSaving(false);return;}
+      try{
+        const dias=Math.round((new Date(formEmb.fDes)-new Date(embAbierto.fEmb))/(1000*60*60*24));
+        const francos=Math.floor(dias/3);
+        await atUpdate("Embarques",embAbierto._id,{FechaDesembarque:formEmb.fDes,DiasTrabajos:dias,FrancosGenerados:francos});
+        await atUpdate("Tripulantes",trip._id,{Embarcado:false});
+        setEmbarques(prev=>prev.map(e=>e._id===embAbierto._id?{...e,fDes:formEmb.fDes,dias,francos}:e));
+        setTripulantes(prev=>prev.map(t=>t._id===trip._id?{...t,embarcado:false}:t));
+        setSaved(true);setTimeout(()=>setSaved(false),3000);setFormEmb({idTrip:"",nombre:"",fEmb:"",fDes:"",tipo:"embarque"});setShowEmb(false);
+      }catch(e){setErrMsg(e.message);}
+    }
+    setSaving(false);
+  };
+
+  const registrarFranco=async()=>{
+    if(!formFranco.idTrip||!formFranco.fecha||!formFranco.dias||saving)return;
+    setSaving(true);setErrMsg("");
+    const trip=tripulantes.find(t=>t._id===formFranco.idTrip);
+    if(!trip){setErrMsg("Tripulante no encontrado");setSaving(false);return;}
+    const nuevo={idTrip:trip.idNum,nombre:trip.nombre,fecha:formFranco.fecha,dias:Number(formFranco.dias),obs:formFranco.obs,tipo:formFranco.tipo};
+    try{const r=await atCreate("FrancosUsados",mapFrancos.to(nuevo));setFrancosUsados(prev=>[{...nuevo,_id:r.id,id:r.id},...prev]);setFormFranco({idTrip:"",nombre:"",fecha:"",dias:"",obs:""});setShowFranco(false);setSaved(true);setTimeout(()=>setSaved(false),3000);}
+    catch(e){setErrMsg(e.message);}setSaving(false);
+  };
+
+  const badgeColor=saldo=>saldo>10?"#16a34a":saldo>=0?"#d97706":"#A11C27";
+
+  return <div>
+    <div className="ph"><div className="ra"/><div className="pt">Control de Tripulación</div></div>
+    <div className="ps">Solo visible para Gerencia — Draga Taruma</div>
+
+    {/* KPIs */}
+    <div className="g4">
+      <div className="kpi" style={{borderTop:"3px solid #313280"}}><div className="kl">Total Tripulantes</div><div className="kv">{tripulantes.length}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid #16a34a"}}><div className="kl">Embarcados</div><div className="kv" style={{color:"#16a34a"}}>{embarcados.length}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid #d97706"}}><div className="kl">En Tierra</div><div className="kv" style={{color:"#d97706"}}>{enTierra.length}</div></div>
+      <div className="kpi" style={{borderTop:"3px solid "+(conSaldoNeg.length?"#A11C27":"#16a34a")}}>
+        <div className="kl">Con Franco Extra</div>
+        <div className="kv" style={{color:conSaldoNeg.length?"#A11C27":"#16a34a"}}>{conSaldoNeg.length}</div>
+        <div className={conSaldoNeg.length?"knok":"kok"}>{conSaldoNeg.length?"tripulantes":"Ninguno"}</div>
+      </div>
+    </div>
+    {/* Resumen de saldos */}
+    <div className="g2" style={{marginBottom:14}}>
+      <div className="kpi" style={{borderTop:"3px solid #16a34a"}}>
+        <div className="kl">🟢 Francos que la Empresa Adeuda</div>
+        <div className="kv" style={{color:"#16a34a"}}>{totalSaldoPositivo}<span className="ku">días</span></div>
+        <div className="kok">{resumen.filter(t=>t.saldo>0).length} tripulante{resumen.filter(t=>t.saldo>0).length!==1?"s":""} con saldo a favor</div>
+      </div>
+      <div className="kpi" style={{borderTop:"3px solid #A11C27"}}>
+        <div className="kl">🔴 Francos Extra Tomados (deuda tripulante)</div>
+        <div className="kv" style={{color:totalNegativo>0?"#A11C27":"#8a8aaa"}}>{totalNegativo>0?"-":""}{totalNegativo}<span className="ku">días</span></div>
+        <div className={totalNegativo>0?"knok":"kok"}>{totalNegativo>0?conSaldoNeg.length+" tripulante"+(conSaldoNeg.length!==1?"s":"")+" tomaron más francos de los generados":"Sin deuda"}</div>
+      </div>
+    </div>
+
+    {/* Vista tabs */}
+    <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}>
+      {[["resumen","📋 Resumen"],["embarques","⚓ Embarques"],["francos","📅 Francos"]].map(([k,lb])=>
+        <button key={k} className="btn" style={{padding:"9px 18px",background:vista===k?"#313280":"#fff",color:vista===k?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:9,fontSize:13}} onClick={()=>setVista(k)}>{lb}</button>
+      )}
+      <div style={{marginLeft:"auto",display:"flex",gap:8}}>
+        <button className="btn btn-p" style={{padding:"9px 14px",fontSize:12}} onClick={()=>setShowEmb(!showEmb)}>⚓ Registrar Mov.</button>
+        <button className="btn btn-p" style={{padding:"9px 14px",fontSize:12}} onClick={()=>setShowFranco(!showFranco)}>📅 Registrar Franco</button>
+        <button className="btn btn-p" style={{padding:"9px 14px",fontSize:12}} onClick={()=>setShowAddTrip(!showAddTrip)}>+ Tripulante</button>
+      </div>
+    </div>
+
+    {saved&&<div className="ok-b">✓ Guardado en Airtable</div>}
+    <ErrMsg msg={errMsg}/>
+
+    {/* Form: Nuevo tripulante */}
+    {showAddTrip&&<div className="card">
+      <CT>➕ Nuevo Tripulante</CT>
+      <div className="form">
+        <div className="r3">
+          <div><label className="lbl">N° Cédula</label><input type="number" value={formTrip.idNum} onChange={e=>setFormTrip({...formTrip,idNum:e.target.value})} placeholder="5911669"/></div>
+          <div><label className="lbl">Nombre completo</label><input value={formTrip.nombre} onChange={e=>setFormTrip({...formTrip,nombre:e.target.value})} placeholder="APELLIDO NOMBRE"/></div>
+          <div><label className="lbl">Cargo</label><select value={formTrip.cargo} onChange={e=>setFormTrip({...formTrip,cargo:e.target.value})}>{cargos.map(c=><option key={c}>{c}</option>)}</select></div>
+        </div>
+        <div className="r2">
+          <div><label className="lbl">N° Libreta</label><input type="number" value={formTrip.libreta} onChange={e=>setFormTrip({...formTrip,libreta:e.target.value})} placeholder="21743"/></div>
+          <div><label className="lbl">Fecha de Ingreso al Proyecto</label><input type="date" value={formTrip.ingreso} onChange={e=>setFormTrip({...formTrip,ingreso:e.target.value})}/></div>
+        </div>
+        <div style={{display:"flex",gap:9}}><button className="btn btn-p" onClick={addTrip} disabled={saving}>{saving?"Guardando...":"Agregar Tripulante"}</button><button className="btn btn-s" onClick={()=>setShowAddTrip(false)}>Cancelar</button></div>
+      </div>
+    </div>}
+
+    {/* Form: Embarque / Desembarque */}
+    {showEmb&&<div className="card">
+      <CT>⚓ Registrar Movimiento</CT>
+      <div className="form">
+        <div className="r2">
+          <div><label className="lbl">Tipo</label>
+            <div style={{display:"flex",gap:8}}>
+              {["embarque","desembarque"].map(t=><button key={t} className="btn" style={{flex:1,padding:"9px",background:formEmb.tipo===t?"#313280":"#fff",color:formEmb.tipo===t?"#fff":"#4a4a6a",border:"1px solid #E2E4EA",borderRadius:8,fontSize:12,textTransform:"capitalize"}} onClick={()=>setFormEmb({...formEmb,tipo:t})}>{t}</button>)}
+            </div>
+          </div>
+          <div><label className="lbl">Tripulante</label>
+            <select value={formEmb.idTrip} onChange={e=>setFormEmb({...formEmb,idTrip:e.target.value})}>
+              <option value="">Seleccionar...</option>
+              {tripulantes.filter(t=>formEmb.tipo==="embarque"?!t.embarcado:t.embarcado).map(t=><option key={t._id} value={t._id}>{t.nombre} · {t.cargo}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="r2">
+          <div><label className="lbl">Fecha {formEmb.tipo==="embarque"?"de Embarque":"de Desembarque"}</label><input type="date" value={formEmb.tipo==="embarque"?formEmb.fEmb:formEmb.fDes} onChange={e=>setFormEmb({...formEmb,[formEmb.tipo==="embarque"?"fEmb":"fDes"]:e.target.value})}/></div>
+        </div>
+        <div style={{display:"flex",gap:9}}><button className="btn btn-p" onClick={registrarEmbarque} disabled={saving}>{saving?"Guardando...":"Registrar"}</button><button className="btn btn-s" onClick={()=>setShowEmb(false)}>Cancelar</button></div>
+      </div>
+    </div>}
+
+    {/* Form: Franco */}
+    {showFranco&&<div className="card">
+      <CT>📅 Registrar Franco Usado</CT>
+      <div className="form">
+        <div className="r4">
+          <div><label className="lbl">Tripulante</label>
+            <select value={formFranco.idTrip} onChange={e=>setFormFranco({...formFranco,idTrip:e.target.value})}>
+              <option value="">Seleccionar...</option>
+              {tripulantes.map(t=><option key={t._id} value={t._id}>{t.nombre}</option>)}
+            </select>
+          </div>
+          <div><label className="lbl">Tipo</label>
+            <select value={formFranco.tipo} onChange={e=>setFormFranco({...formFranco,tipo:e.target.value})}>
+              <option value="franco">Franco (descuenta saldo)</option>
+              <option value="vacaciones">Vacaciones (no descuenta saldo)</option>
+            </select>
+          </div>
+          <div><label className="lbl">Fecha</label><input type="date" value={formFranco.fecha} onChange={e=>setFormFranco({...formFranco,fecha:e.target.value})}/></div>
+          <div><label className="lbl">Días</label><input type="number" value={formFranco.dias} onChange={e=>setFormFranco({...formFranco,dias:e.target.value})} placeholder="0"/></div>
+        </div>
+        {formFranco.tipo==="vacaciones"&&<div className="warn-b">ℹ Las vacaciones NO descuentan del saldo de francos generados.</div>}
+        <div><label className="lbl">Observaciones</label><input value={formFranco.obs} onChange={e=>setFormFranco({...formFranco,obs:e.target.value})} placeholder="Motivo, novedades..."/></div>
+        <div style={{display:"flex",gap:9}}><button className="btn btn-p" onClick={registrarFranco} disabled={saving}>{saving?"Guardando...":"Registrar"}</button><button className="btn btn-s" onClick={()=>setShowFranco(false)}>Cancelar</button></div>
+      </div>
+    </div>}
+
+    {/* Vista Resumen - tabla única clara */}
+    {vista==="resumen"&&<div className="card">
+      <CT>📋 Situación de Francos — Toda la Tripulación</CT>
+      <div className="ovfl">
+        <table>
+          <thead><tr>
+            <th>Nombre</th>
+            <th>Cargo</th>
+            <th>Estado</th>
+            <th style={{textAlign:"center"}}>Francos Generados</th>
+            <th style={{textAlign:"center"}}>Francos Usados</th>
+            <th style={{textAlign:"center"}}>Saldo</th>
+            <th>Situación</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+          {resumen.sort((a,b)=>a.saldo-b.saldo).map((t,i)=>{
+            const rowBg=t.saldo<0?"rgba(161,28,39,.04)":t.embarcado?"rgba(22,163,74,.03)":"transparent";
+            return <tr key={i} style={{background:rowBg}}>
+              <td style={{fontWeight:700,fontSize:13}}>{t.nombre}</td>
+              <td><span className="badge badge-m" style={{fontSize:9}}>{t.cargo}</span></td>
+              <td>{t.embarcado
+                ?<span className="badge badge-g">⚓ Embarcado</span>
+                :<span className="badge badge-a">🏠 En Tierra ({t.diasEnTierra}d)</span>}
+              </td>
+              <td style={{textAlign:"center",fontWeight:600}}>{t.totalFrancosGen}</td>
+              <td style={{textAlign:"center",fontWeight:600}}>{t.totalFrancosUs}</td>
+              <td style={{textAlign:"center"}}>
+                {t.saldo>0&&<span style={{color:"#16a34a",fontWeight:800,fontSize:14}}>+{t.saldo}</span>}
+                {t.saldo===0&&<span style={{color:"#8a8aaa",fontWeight:600}}>0</span>}
+                {t.saldo<0&&<span style={{color:"#A11C27",fontWeight:800,fontSize:14}}>{t.saldo}</span>}
+              </td>
+              <td style={{fontSize:12}}>
+                {t.saldo>0&&!t.embarcado&&<span style={{color:"#16a34a"}}>Empresa le debe {t.saldo}d · Fin franco: {t.finFranco||"—"}</span>}
+                {t.saldo>0&&t.embarcado&&<span style={{color:"#16a34a"}}>Empresa le debe {t.saldo}d de franco</span>}
+                {t.saldo===0&&<span style={{color:"#8a8aaa"}}>Equilibrado</span>}
+                {t.saldo<0&&<span style={{color:"#A11C27",fontWeight:600}}>Tomó {Math.abs(t.saldo)}d extra de franco</span>}
+              </td>
+              <td><button className="btn btn-s" style={{padding:"3px 8px",fontSize:11,color:"#A11C27",borderColor:"rgba(161,28,39,.3)"}} onClick={async()=>{if(!window.confirm("¿Borrar tripulante "+t.nombre+"?"))return;try{await atDelete("Tripulantes",t._id);setTripulantes(prev=>prev.filter(x=>x._id!==t._id));}catch(err){alert("Error: "+err.message);}}}>✕</button></td>
+            </tr>;
+          })}
+          </tbody>
+          <tfoot>
+            <tr style={{borderTop:"2px solid #E2E4EA",background:"#F4F5F7"}}>
+              <td colSpan="3" style={{fontWeight:700,fontSize:12,padding:"10px 11px",color:"#1a1a2e"}}>TOTALES</td>
+              <td style={{textAlign:"center",fontWeight:700,color:"#313280"}}>{resumen.reduce((s,t)=>s+t.totalFrancosGen,0)}</td>
+              <td style={{textAlign:"center",fontWeight:700,color:"#313280"}}>{resumen.reduce((s,t)=>s+t.totalFrancosUs,0)}</td>
+              <td style={{textAlign:"center"}}></td>
+              <td colSpan="2" style={{fontSize:12,padding:"10px 11px"}}>
+                {totalSaldoPositivo>0&&<span style={{color:"#16a34a",fontWeight:700,marginRight:16}}>🟢 Empresa adeuda: +{totalSaldoPositivo}d</span>}
+                {totalNegativo>0&&<span style={{color:"#A11C27",fontWeight:700}}>🔴 Francos extra tomados: −{totalNegativo}d</span>}
+                {totalNegativo===0&&totalSaldoPositivo===0&&<span style={{color:"#8a8aaa"}}>Sin diferencias</span>}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>}
+
+    {/* Vista Embarques */}
+    {vista==="embarques"&&<div className="card">
+      <CT>⚓ Historial de Embarques</CT>
+      <div className="ovfl">
+        <table><thead><tr><th>Nombre</th><th>Cargo</th><th>Embarque</th><th>Desembarque</th><th>Días</th><th>Francos Gen.</th></tr></thead>
+          <tbody>{embarques.slice(0,50).map((e,i)=><tr key={i}>
+            <td style={{fontWeight:600}}>{e.nombre}</td>
+            <td className="m">{tripulantes.find(t=>t.idNum===e.idTrip)?.cargo||"—"}</td>
+            <td className="m">{e.fEmb}</td>
+            <td className="m">{e.fDes||<span className="badge badge-g">Embarcado</span>}</td>
+            <td style={{fontWeight:700,color:"#313280"}}>{e.dias||"—"}</td>
+            <td>{e.francos||"—"}</td>
+          </tr>)}
+          {!embarques.length&&<tr><td colSpan="6" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin registros</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>}
+
+    {/* Vista Francos */}
+    {vista==="francos"&&<div className="card">
+      <CT>📅 Historial de Francos Usados</CT>
+      <table><thead><tr><th>Nombre</th><th>Tipo</th><th>Fecha</th><th>Días</th><th>Observaciones</th></tr></thead>
+        <tbody>{francosUsados.map((f,i)=><tr key={i}>
+          <td style={{fontWeight:600}}>{f.nombre}</td>
+          <td>{f.tipo==="vacaciones"?<span className="badge badge-a">Vacaciones</span>:<span className="badge badge-n">Franco</span>}</td>
+          <td className="m">{f.fecha}</td>
+          <td style={{fontWeight:700,color:f.tipo==="vacaciones"?"#d97706":"#313280"}}>{f.dias}</td>
+          <td className="m">{f.obs?f.obs.replace("[VAC] ",""):"—"}</td>
+        </tr>)}
+        {!francosUsados.length&&<tr><td colSpan="4" style={{textAlign:"center",color:"#8a8aaa",padding:20}}>Sin registros</td></tr>}
+        </tbody>
+      </table>
+    </div>}
+  </div>;
+}
+
+
+// ── App principal ──────────────────────────────────────────────────────────────
+function App(){
+  const[user,setUser]=useState(null);
+  const[page,setPage]=useState("dashboard");
+  const[hlId,setHlId]=useState(null);
+  const[loading,setLoading]=useState(false);
+  const[loadMsg,setLoadMsg]=useState("Cargando datos...");
+
+  // Data state
+  const[eventos,setEventos]=useState([]);
+  const[trafico,setTrafico]=useState([]);
+  const[mant,setMant]=useState([]);
+  const[inc,setInc]=useState([]);
+  const[comb,setComb]=useState([]);
+  const[log,setLog]=useState([]);
+  const[inv,setInv]=useState([]);
+  const[alarmas,setAlarmas]=useState([]);
+  const[reu,setReu]=useState([]);
+  const[actas,setActas]=useState([]);
+  const[turnos,setTurnos]=useState(TURNOS_I);
+  const[tripulantes,setTripulantes]=useState([]);
+  const[embarques,setEmbarques]=useState([]);
+  const[francosUsados,setFrancosUsados]=useState([]);
+  const[tipos,setTipos]=useState(TIPOS_I);
+
+  const navTo=(p,id=null)=>{setPage(p);setHlId(id);};
+
+  const loadData=async()=>{
+    setLoading(true);
+    try{
+      setLoadMsg("Cargando eventos...");
+      const [evRecs,trRecs,maRecs,inRecs,coRecs,loRecs,ivRecs,alRecs,reRecs,acRecs,tripRecs,embRecs,francRecs]=await Promise.all([
+        atList("Eventos"),atList("Trafico"),atList("Mantenimiento"),atList("Incidentes"),
+        atList("Combustible"),atList("Logbook"),atList("Inventario"),atList("Alarmas"),
+        atList("Reuniones"),atList("ActasMando"),atList("Tripulantes"),atList("Embarques"),atList("FrancosUsados"),
+      ]);
+      setEventos(evRecs.map(mappers.Eventos.from).sort((a,b)=>new Date(b.ts)-new Date(a.ts)));
+      setTrafico(trRecs.map(mappers.Trafico.from).sort((a,b)=>new Date(b.ts)-new Date(a.ts)));
+      setMant(maRecs.map(mappers.Mantenimiento.from));
+      setInc(inRecs.map(mappers.Incidentes.from).sort((a,b)=>new Date(b.fRep)-new Date(a.fRep)));
+      setComb(coRecs.map(mappers.Combustible.from).sort((a,b)=>a.fecha.localeCompare(b.fecha)));
+      setLog(loRecs.map(mappers.Logbook.from).sort((a,b)=>a.fecha.localeCompare(b.fecha)));
+      setInv(ivRecs.map(mappers.Inventario.from));
+      setAlarmas(alRecs.map(mappers.Alarmas.from).sort((a,b)=>a.fecha.localeCompare(b.fecha)));
+      setReu(reRecs.map(mappers.Reuniones.from).sort((a,b)=>a.fecha.localeCompare(b.fecha)));
+      setActas(acRecs.map(mappers.ActasMando.from).sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)));
+      setTripulantes(tripRecs.map(mapTrip.from).sort((a,b)=>a.nombre.localeCompare(b.nombre)));
+      setEmbarques(embRecs.map(mapEmb.from).sort((a,b)=>b.fEmb.localeCompare(a.fEmb)));
+      setFrancosUsados(francRecs.map(mapFrancos.from).sort((a,b)=>b.fecha.localeCompare(a.fecha)));
+      setLoadMsg("¡Listo!");
+    }catch(e){
+      console.error("Error cargando datos:",e);
+      setLoadMsg("Error: "+e.message);
+      await new Promise(r=>setTimeout(r,2000));
+    }
+    setLoading(false);
+  };
+
+  const handleLogin=async(u)=>{
+    setUser(u);
+    await loadData();
+    setPage(u.role==="gerente"||u.role==="capitan"?"dashboard":"reporte_op");
+  };
+
+  if(!user) return <Login onLogin={handleLogin}/>;
+  if(loading) return <Loading msg={loadMsg}/>;
+
+  const groups=NAV.map(g=>({...g,items:g.items.map(n=>({...n,ok:n.roles.includes(user.role)}))}));
+
+  return <div className="app">
+    <header className="hdr">
+      <div className="hdr-l">
+        <Logo h={32}/>
+        <div className="hdr-div"/>
+        <div><div className="hdr-t">Sistema Operativo</div><div className="hdr-s">Dragados del Paraguay</div></div>
+      </div>
+      <div className="hdr-r">
+        <div className="ubadge"><div className="odot"/><span className={"rpill "+RPILL[user.role]}>{ROLES_LABEL[user.role]}</span><span className="uname">{user.name}</span></div>
+        <button className="btn-out" onClick={()=>{setUser(null);setEventos([]);setTrafico([]);setMant([]);setInc([]);setComb([]);setLog([]);setInv([]);setAlarmas([]);setReu([]);setActas([]);}}>Salir</button>
+      </div>
+    </header>
+    <div className="body">
+      <nav className="sb">
+        {groups.map(g=><div key={g.group}>
+          <div className="sg">{g.group}</div>
+          {g.items.map(n=><div key={n.id} className={"ni"+(page===n.id?" act":"")+(n.ok?"":" lk")} onClick={()=>n.ok&&navTo(n.id)}>
+            <span className="ni-ic">{n.icon}</span><span>{n.label}</span>{!n.ok&&<span className="ni-lk">🔒</span>}
+          </div>)}
+        </div>)}
+        <div className="sf"><div className="sf-n">{user.name}</div><div className="sf-s">{user.cargo}</div><div className="sf-v">DDP · v1.0 · 2026</div></div>
+      </nav>
+      <main className="main">
+        {page==="dashboard"     &&<Dashboard eventos={eventos} mant={mant} inc={inc} alarmas={alarmas} inv={inv} navTo={navTo}/>}
+        {page==="reporte_op"    &&<ReporteOp eventos={eventos} setEventos={setEventos} user={user} turnos={turnos} tipos={tipos}/>}
+        {page==="trafico"       &&<Trafico trafico={trafico} setTrafico={setTrafico} user={user}/>}
+        {page==="rep_semanal"   &&<RepSemanal user={user}/>}
+        {page==="logbook"       &&<Logbook log={log} setLog={setLog} user={user}/>}
+        {page==="combustible"   &&<Combustible comb={comb} setComb={setComb} user={user}/>}
+        {page==="mantenimiento" &&<Mantenimiento mant={mant} setMant={setMant} user={user} hlId={hlId}/>}
+        {page==="alarmas"       &&<Alarmas user={user} alarmas={alarmas} setAlarmas={setAlarmas}/>}
+        {page==="inventario"    &&<Inventario inv={inv} setInv={setInv} user={user} hlId={hlId}/>}
+        {page==="incidentes"    &&<Incidentes inc={inc} setInc={setInc} user={user} hlId={hlId}/>}
+        {page==="actas"         &&<Actas user={user} actas={actas} setActas={setActas}/>}
+        {page==="reuniones"     &&<Reuniones reu={reu} setReu={setReu} user={user}/>}
+        {page==="usuarios"       &&<Usuarios/>}
+        {page==="config"        &&<Config turnos={turnos} setTurnos={setTurnos} tipos={tipos} setTipos={setTipos}/>}
+        {page==="procedimientos" &&<Procedimientos user={user}/>}
+        {page==="tripulacion"   &&<Tripulacion tripulantes={tripulantes} setTripulantes={setTripulantes} embarques={embarques} setEmbarques={setEmbarques} francosUsados={francosUsados} setFrancosUsados={setFrancosUsados} user={user}/>}
+      </main>
+    </div>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
