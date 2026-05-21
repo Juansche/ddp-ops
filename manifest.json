@@ -1,0 +1,28 @@
+{
+  "name": "DDP Sistema Operativo",
+  "short_name": "DDP Taruma",
+  "description": "Sistema de gestión operativa - Draga Taruma - Dragados del Paraguay",
+  "start_url": "/ddp-ops/",
+  "scope": "/ddp-ops/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F5F7",
+  "theme_color": "#313280",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": []
+}
